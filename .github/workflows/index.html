@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Форум трудовой молодёжи — Наследие созидателей</title>
+  <meta name="description" content="Форум трудовой молодёжи «Наследие созидателей». Труд. Творчество. Движение вперёд.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- SVG-символы -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 48 48"><path d="M8 40 40 8M16 8h24v24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="square"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 100 100"><path fill="currentColor" d="M43 2h14l3 13 9 4 11-8 10 10-8 11 4 9 13 3v14l-13 3-4 9 8 11-10 10-11-8-9 4-3 13H43l-3-13-9-4-11 8-10-10 8-11-4-9-13-3V43l13-3 4-9-8-11 10-10 11 8 9-4zM50 32a18 18 0 1 0 0 36 18 18 0 1 0 0-36z"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><path d="M5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM19 8V3l4 1.5L19 6M19 8c0 4-6 3-6 7s6 3 6 5M7 18h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-team" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="3"/><circle cx="5" cy="10" r="2.2"/><circle cx="19" cy="10" r="2.2"/><path d="M6.5 20a5.5 5.5 0 0 1 11 0M1.5 19a4 4 0 0 1 5-3.6M22.5 19a4 4 0 0 0-5-3.6"/></g></symbol>
+  <symbol id="i-mentor" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 10-5.5M17.5 13l1.4 2.8 3.1.4-2.2 2.2.5 3.1-2.8-1.5-2.8 1.5.5-3.1-2.2-2.2 3.1-.4z"/></g></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.6"/></g></symbol>
+  <symbol id="i-edu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 4 1.5 9 12 14l10.5-5z"/><path d="M5.5 11v5c2 2 11 2 13 0v-5M22 9v6"/></g></symbol>
+  <symbol id="i-case" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="1.5"/><path d="M8.5 7V4.5h7V7M2.5 12.5h19M11 12.5v2h2v-2"/></g></symbol>
+  <symbol id="i-museum" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5 2.5 7.5h19zM4 10v8M8 10v8M12 10v8M16 10v8M20 10v8M2 21h20"/></g></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></g></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+  <symbol id="i-person" viewBox="0 0 100 120"><path fill="currentColor" d="M50 12c14 0 24 11 24 26 0 16-10 30-24 30S26 54 26 38c0-15 10-26 24-26zM8 120c2-26 18-42 42-42s40 16 42 42z"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Перейти к содержанию</a>
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="container header__inner">
+    <a href="#top" class="logo" aria-label="На главную">
+      <span class="logo__mark" aria-hidden="true"><svg><use href="#i-gear"/></svg></span>
+      <span class="logo__text">Форум<br>трудовой<br>молодёжи</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Основная навигация">
+      <a href="#about">О форуме</a>
+      <a href="#values">Ценности</a>
+      <a href="#tracks">Треки</a>
+      <a href="#program">Программа</a>
+      <a href="#speakers">Спикеры</a>
+      <a href="#partners">Партнёрам</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <a href="#register" class="btn btn--blue header__cta">Регистрация</a>
+    <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hatch hatch--hero" aria-hidden="true"></div>
+  <div class="container hero__grid">
+    <div class="hero__left">
+      <span class="corner corner--tl" aria-hidden="true"></span>
+      <p class="hero__eyebrow">Форум<br>трудовой<br>молодёжи</p>
+      <p class="hero__manifest">Твой голос.<br>Твои идеи.<br>Твоё время.<br>Твоё будущее.</p>
+      <div class="hero__meta">
+        <div><svg class="ico"><use href="#i-cal"/></svg><span>ДД.ММ.2026</span></div>
+        <div><svg class="ico"><use href="#i-pin"/></svg><span>Санкт-Петербург</span></div>
+      </div>
+    </div>
+
+    <div class="hero__center">
+      <h1 class="hero__title">
+        <span class="line"><span>Наследие</span></span>
+        <span class="line"><span>созидателей</span></span>
+      </h1>
+      <div class="hero__art">
+        <div class="hero__shapes" aria-hidden="true">
+          <span class="shape shape--circle"></span>
+          <span class="shape shape--bar1"></span>
+          <span class="shape shape--bar2"></span>
+          <span class="shape shape--dots"></span>
+        </div>
+        <div class="crop crop--hero" style="--x:360;--y:462;--w:900;--h:382">
+          <img src="assets/slide1.jpg" alt="Созидатели прошлого и настоящего: молодой специалист, М. Ломоносов, Пётр I" width="1500" height="844">
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__right">
+      <svg class="hero__arrow"><use href="#i-arrow"/></svg>
+      <ul class="hero__words">
+        <li>Труд</li><li>Творчество</li><li>Движение</li><li>Вперёд</li>
+      </ul>
+      <div class="countdown" id="countdown" aria-label="До начала форума">
+        <p class="countdown__label">До старта</p>
+        <div class="countdown__row">
+          <div><b data-cd="d">00</b><span>дней</span></div>
+          <div><b data-cd="h">00</b><span>часов</span></div>
+          <div><b data-cd="m">00</b><span>минут</span></div>
+        </div>
+      </div>
+      <a href="#register" class="btn btn--blue btn--lg">Стать участником <svg class="ico"><use href="#i-arrow"/></svg></a>
+      <p class="hero__motto">Вдохновляемся прошлым —<br>создаём будущее</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    <span>Трудись. Создавай. Двигайся вперёд</span><svg><use href="#i-arrow"/></svg>
+    <span>Сила в смелости и идеях</span><svg><use href="#i-arrow"/></svg>
+    <span>Будь созидателем</span><svg><use href="#i-arrow"/></svg>
+    <span>Миром правит труд и вера в себя</span><svg><use href="#i-arrow"/></svg>
+    <span>Трудись. Создавай. Двигайся вперёд</span><svg><use href="#i-arrow"/></svg>
+    <span>Сила в смелости и идеях</span><svg><use href="#i-arrow"/></svg>
+    <span>Будь созидателем</span><svg><use href="#i-arrow"/></svg>
+    <span>Миром правит труд и вера в себя</span><svg><use href="#i-arrow"/></svg>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section class="section about" id="about">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">01</span>
+      <h2 class="h2">О форуме — <em>труд как созидание</em></h2>
+    </div>
+    <div class="about__grid">
+      <div class="about__text reveal">
+        <p class="lead">Идея форума — показать молодёжи, что труд — это не только про выполнение задач, но и про творчество, преобразование мира, личный рост и культурный код страны.</p>
+        <p>Это про умение создавать новое, брать ответственность, работать в команде, не бояться неизведанного.</p>
+        <p>Форум соединяет традиции российского и советского отношения к труду с современными вызовами и практиками профессионального роста.</p>
+      </div>
+      <ul class="stats reveal">
+        <li><b data-count="1000">0</b><span>+</span><p>участников</p></li>
+        <li><b data-count="5">0</b><p>тематических треков</p></li>
+        <li><b data-count="30">0</b><span>+</span><p>спикеров и наставников</p></li>
+        <li><b data-count="2">0</b><p>дня насыщенной программы</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUES ============ -->
+<section class="section values" id="values">
+  <div class="hatch hatch--tl" aria-hidden="true"></div>
+  <div class="container values__grid">
+    <div class="values__left reveal">
+      <span class="sec-num">02</span>
+      <h2 class="h2 h2--xl">Ценности форума: <em>создавать, развиваться, двигаться вперёд</em></h2>
+      <div class="values__art">
+        <svg class="values__gear" aria-hidden="true"><use href="#i-gear"/></svg>
+        <div class="crop crop--values" style="--x:450;--y:70;--w:390;--h:700">
+          <img src="assets/slide2.jpg" alt="Девушка в рабочем комбинезоне поднимается по ступеням" loading="lazy" width="1500" height="844">
+        </div>
+      </div>
+    </div>
+    <div class="values__right">
+      <ol class="numlist">
+        <li class="reveal"><p><b>Трудолюбие как созидание</b> — возможность оставить след и принести пользу.</p></li>
+        <li class="reveal"><p><b>Творчество в работе</b> — нестандартное мышление и улучшение процессов даже в «рутинных» профессиях.</p></li>
+        <li class="reveal"><p><b>Открытость новому</b> — готовность учиться и экспериментировать.</p></li>
+        <li class="reveal"><p><b>Профессиональное развитие</b> — постоянное совершенствование навыков и компетенций.</p></li>
+        <li class="reveal"><p><b>Движение вперёд</b> — готовность к неизвестности и новым вызовам.</p></li>
+        <li class="reveal"><p><b>Личная и командная работа</b> — сочетание самостоятельности с вкладом в общий результат.</p></li>
+      </ol>
+      <blockquote class="brush reveal">
+        <svg class="brush__arrow"><use href="#i-arrow"/></svg>
+        <div>
+          <p class="brush__label">Ключевой посыл:</p>
+          <p class="brush__quote">«Ты можешь быть тем самым человеком, который меняет мир вместе с собой»</p>
+        </div>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HEROES ============ -->
+<section class="section heroes" id="heroes">
+  <div class="container heroes__grid">
+    <div class="heroes__text">
+      <div class="reveal">
+        <span class="sec-num">03</span>
+        <h2 class="h2">Герои, которые <em>соединяют простоту и величие</em></h2>
+        <hr class="rule">
+      </div>
+      <ul class="arrowlist">
+        <li class="reveal"><b>Пётр I</b> — образ реформатора и «первопроходца», который не боялся ломать старое ради нового.</li>
+        <li class="reveal"><b>М. Ломоносов</b> — синтез науки, труда и творчества: крестьянский сын, ставший учёным, поэтом, организатором.</li>
+        <li class="reveal"><b>Д. Менделеев</b> — исследователь, видевший в науке служение обществу.</li>
+        <li class="reveal"><b>К. Станиславский и В. Мейерхольд</b> — театральные новаторы, революционеры творческого поиска.</li>
+        <li class="reveal"><b>В. Маяковский и А. Родченко</b> — «человек-оркестр» эпохи авангарда: труд и креатив в одном человеке.</li>
+        <li class="reveal"><b>Ю. Гагарин</b> — смелость и ответственность: шаг в неизвестность ради общего дела.</li>
+        <li class="reveal"><b>В. Высоцкий и С. Курёхин</b> — искренность, смелость в экспериментах и культурное влияние.</li>
+      </ul>
+    </div>
+    <div class="heroes__art reveal">
+      <div class="crop crop--heroes" style="--x:700;--y:30;--w:780;--h:790">
+        <img src="assets/slide3.jpg" alt="Коллаж: герои российской и советской истории" loading="lazy" width="1500" height="844">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRACKS ============ -->
+<section class="section tracks" id="tracks">
+  <div class="tracks__bg" aria-hidden="true"></div>
+  <div class="container tracks__grid">
+    <div class="tracks__content">
+      <div class="reveal">
+        <span class="sec-num sec-num--light">04</span>
+        <h2 class="h2 h2--mixed">От личной амбиции — <br>к общественной пользе</h2>
+      </div>
+      <div class="goals reveal">
+        <h3 class="h3">Цели форума</h3>
+        <ul class="slashlist">
+          <li>Сформировать у молодёжи веру в себя, личный рост и успех.</li>
+          <li>Показать связь между амбициями, профессиональным развитием и общественной пользой.</li>
+          <li>Создать площадку для обмена практиками, наставничества и проектных инициатив.</li>
+          <li>Укрепить профессиональную идентичность через историко-культурный контекст.</li>
+        </ul>
+      </div>
+      <h3 class="h3 reveal">Основные треки</h3>
+      <div class="track-cards">
+        <article class="track reveal"><span class="track__n">1</span><h4>Труд как реализация амбиций и служение обществу</h4><p>Лекции и дискуссии</p><svg class="track__arrow"><use href="#i-arrow"/></svg></article>
+        <article class="track reveal"><span class="track__n">2</span><h4>Творчество как метод</h4><p>Воркшопы по креативному мышлению, дизайну, медиа и искусству</p><svg class="track__arrow"><use href="#i-arrow"/></svg></article>
+        <article class="track reveal"><span class="track__n">3</span><h4>Команда и лидерство</h4><p>Тренинги по управлению проектами и коммуникации</p><svg class="track__arrow"><use href="#i-arrow"/></svg></article>
+        <article class="track reveal"><span class="track__n">4</span><h4>Преодоление неизвестности</h4><p>Кейсы об инновациях и выходе из зоны комфорта</p><svg class="track__arrow"><use href="#i-arrow"/></svg></article>
+        <article class="track reveal"><span class="track__n">5</span><h4>Практика и результат</h4><p>Мастер-классы, хакатоны и проектные сессии</p><svg class="track__arrow"><use href="#i-arrow"/></svg></article>
+      </div>
+    </div>
+    <div class="tracks__art reveal">
+      <div class="crop crop--tracks" style="--x:900;--y:90;--w:600;--h:754">
+        <img src="assets/slide4.jpg" alt="Молодой человек в синих очках смотрит вверх" loading="lazy" width="1500" height="844">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROGRAM ============ -->
+<section class="section program" id="program">
+  <div class="dots dots--tr" aria-hidden="true"></div>
+  <div class="container program__grid">
+    <div class="program__art reveal">
+      <div class="crop crop--program" style="--x:0;--y:0;--w:580;--h:844">
+        <img src="assets/slide5.jpg" alt="Молодые люди поднимаются по синей лестнице" loading="lazy" width="1500" height="844">
+      </div>
+    </div>
+    <div class="program__content">
+      <div class="reveal">
+        <span class="sec-num">05</span>
+        <h2 class="h2 h2--xl">Программа <em>превращает идеи в практику</em></h2>
+      </div>
+      <ul class="formats">
+        <li class="reveal"><svg><use href="#i-arrow"/></svg><div><b>Лекции и паблик-токи</b> с экспертами и наставниками — осмысление труда, развития и служения обществу.</div></li>
+        <li class="reveal"><svg><use href="#i-arrow"/></svg><div><b>Воркшопы и практические сессии</b> — развитие креативного мышления и прикладных навыков.</div></li>
+        <li class="reveal"><svg><use href="#i-arrow"/></svg><div><b>Проектные лаборатории и хакатоны</b> — создание решений для реальных задач.</div></li>
+        <li class="reveal"><svg><use href="#i-arrow"/></svg><div><b>Панельные дискуссии</b> — разговор о будущем профессий и роли молодого специалиста.</div></li>
+        <li class="reveal"><svg><use href="#i-arrow"/></svg><div><b>Культурно-исторические модули</b> — экскурсии, выставки, кинопоказы и перформансы.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Расписание -->
+  <div class="container schedule reveal" id="schedule">
+    <div class="schedule__head">
+      <h3 class="h2 h2--sm">Расписание</h3>
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" role="tab" aria-selected="true" data-day="1">День 1</button>
+        <button class="tab" role="tab" aria-selected="false" data-day="2">День 2</button>
+      </div>
+    </div>
+    <ol class="timeline" data-day-panel="1">
+      <li><time>09:00</time><div><b>Регистрация участников</b><span>Холл · welcome-зона</span></div><em>Общее</em></li>
+      <li><time>10:00</time><div><b>Пленарное заседание «Наследие созидателей»</b><span>Главная сцена</span></div><em>Пленарная</em></li>
+      <li><time>12:00</time><div><b>Параллельные сессии по трекам 1–3</b><span>Залы А, Б, В</span></div><em>Треки</em></li>
+      <li><time>15:00</time><div><b>Проектные лаборатории</b><span>Коворкинг</span></div><em>Практика</em></li>
+      <li><time>18:00</time><div><b>Культурная программа: кинопоказ</b><span>Главная сцена</span></div><em>Культура</em></li>
+    </ol>
+    <ol class="timeline" data-day-panel="2" hidden>
+      <li><time>10:00</time><div><b>Панельная дискуссия о будущем профессий</b><span>Главная сцена</span></div><em>Дискуссия</em></li>
+      <li><time>12:00</time><div><b>Параллельные сессии по трекам 4–5</b><span>Залы А, Б</span></div><em>Треки</em></li>
+      <li><time>14:00</time><div><b>Финал хакатона и защита проектов</b><span>Коворкинг</span></div><em>Практика</em></li>
+      <li><time>17:00</time><div><b>Закрытие форума и награждение</b><span>Главная сцена</span></div><em>Общее</em></li>
+    </ol>
+    <p class="note">* Расписание-заглушка, заменим на актуальное.</p>
+  </div>
+</section>
+
+<!-- ============ SPEAKERS ============ -->
+<section class="section speakers" id="speakers">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">06</span>
+      <h2 class="h2">Спикеры <em>и наставники</em></h2>
+    </div>
+    <div class="speaker-grid">
+      <!-- карточки генерируются в main.js -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ PARTICIPANT ============ -->
+<section class="section path" id="path">
+  <div class="container path__grid">
+    <div class="path__content">
+      <div class="reveal">
+        <span class="sec-num">07</span>
+        <h2 class="h2">Участник <em>проходит свой путь и создаёт вместе с другими</em></h2>
+      </div>
+      <h3 class="h3 reveal">Механизмы вовлечения</h3>
+      <ul class="mech">
+        <li class="reveal"><span class="mech__ico"><svg><use href="#i-route"/></svg></span><div><b>Персональные маршруты</b><p>Участник выбирает треки и формирует индивидуальную программу.</p></div><span class="mech__n">01</span></li>
+        <li class="reveal"><span class="mech__ico"><svg><use href="#i-team"/></svg></span><div><b>Проектные группы</b><p>Команды решают реальные задачи от партнёров форума.</p></div><span class="mech__n">02</span></li>
+        <li class="reveal"><span class="mech__ico"><svg><use href="#i-mentor"/></svg></span><div><b>Наставничество</b><p>Опытные специалисты курируют группы и помогают реализовать идеи.</p></div><span class="mech__n">03</span></li>
+        <li class="reveal"><span class="mech__ico"><svg><use href="#i-chat"/></svg></span><div><b>Обратная связь</b><p>После каждого блока участники оценивают полезность и предлагают улучшения.</p></div><span class="mech__n">04</span></li>
+      </ul>
+    </div>
+    <div class="path__art reveal">
+      <div class="crop crop--path" style="--x:800;--y:0;--w:700;--h:610">
+        <img src="assets/slide7.jpg" alt="Юноша с рюкзаком поднимается по ступеням к стрелке" loading="lazy" width="1500" height="844">
+      </div>
+      <p class="path__caption">Так форум объединяет <em>личную инициативу, командную работу и поддержку профессионалов</em> — от первого интереса до готового проектного решения.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PARTNERS ============ -->
+<section class="section partners" id="partners">
+  <div class="container">
+    <div class="partners__top">
+      <div class="reveal">
+        <span class="sec-num">08</span>
+        <h2 class="h2 h2--xl"><em>Партнёрство</em> превращает форум в долгосрочную платформу</h2>
+      </div>
+      <ul class="support">
+        <li class="reveal"><span class="support__ico"><svg><use href="#i-edu"/></svg></span><div><b>Образовательные учреждения</b> — привлечение студентов и организация академических модулей.</div></li>
+        <li class="reveal"><span class="support__ico"><svg><use href="#i-case"/></svg></span><div><b>Компании и работодатели</b> — реальные кейсы, мастер-классы и стажировки.</div></li>
+        <li class="reveal"><span class="support__ico"><svg><use href="#i-museum"/></svg></span><div><b>Музеи, архивы и культурные институции</b> — историко-культурный контекст и выставки.</div></li>
+        <li class="reveal"><span class="support__ico"><svg><use href="#i-team"/></svg></span><div><b>Молодёжные и волонтёрские организации</b> — вовлечение активистов и социальные инициативы.</div></li>
+      </ul>
+    </div>
+    <div class="logos reveal" aria-label="Партнёры форума">
+      <div class="logo-ph">Логотип</div><div class="logo-ph">Логотип</div><div class="logo-ph">Логотип</div>
+      <div class="logo-ph">Логотип</div><div class="logo-ph">Логотип</div><div class="logo-ph">Логотип</div>
+    </div>
+  </div>
+  <div class="banner reveal">
+    <div class="crop crop--banner" style="--x:330;--y:445;--w:520;--h:210">
+      <img src="assets/slide9.jpg" alt="" loading="lazy" width="1500" height="844">
+    </div>
+    <div class="banner__text">
+      <svg><use href="#i-arrow"/></svg>
+      <p>Форум становится пространством, где молодые люди осознают связь с культурными традициями страны и получают инструменты для реализации потенциала.</p>
+      <a href="#contacts" class="btn btn--white">Стать партнёром</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REGISTER ============ -->
+<section class="section register" id="register">
+  <div class="register__stripes" aria-hidden="true"></div>
+  <div class="container register__grid">
+    <div class="register__intro reveal">
+      <span class="sec-num sec-num--light">09</span>
+      <h2 class="h2 h2--light">Регистрация</h2>
+      <p class="lead">Будь созидателем: сегодня ты учишься, завтра — меняешь мир.</p>
+      <ul class="reg-options">
+        <li><b>Индивидуальная заявка</b><span>Для студентов и молодых специалистов</span></li>
+        <li><b>Делегация</b><span>Для вузов, колледжей и предприятий</span></li>
+      </ul>
+    </div>
+    <form class="form reveal" id="regForm" novalidate>
+      <div class="field">
+        <label for="f-name">Имя и фамилия *</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required>
+        <small class="err" aria-live="polite"></small>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="f-email">Email *</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+          <small class="err" aria-live="polite"></small>
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel">
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-org">Вуз / организация</label>
+        <input id="f-org" name="org" type="text" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="f-track">Интересующий трек</label>
+        <select id="f-track" name="track">
+          <option>Труд как реализация амбиций</option>
+          <option>Творчество как метод</option>
+          <option>Команда и лидерство</option>
+          <option>Преодоление неизвестности</option>
+          <option>Практика и результат</option>
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" required> <span>Согласен на обработку персональных данных</span></label>
+      <button class="btn btn--white btn--lg" type="submit">Отправить заявку <svg class="ico"><use href="#i-arrow"/></svg></button>
+      <p class="form__ok" hidden>Заявка принята! (демо — данные никуда не отправляются)</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ CONTACTS ============ -->
+<section class="section contacts" id="contacts">
+  <div class="container contacts__grid">
+    <div class="reveal">
+      <span class="sec-num">10</span>
+      <h2 class="h2">Контакты</h2>
+      <dl class="contacts__list">
+        <div><dt>Организатор</dt><dd>Название организации</dd></div>
+        <div><dt>Площадка</dt><dd>Санкт-Петербург, адрес площадки</dd></div>
+        <div><dt>Телефон</dt><dd>+7 (000) 000-00-00</dd></div>
+        <div><dt>Email</dt><dd>info@example.ru</dd></div>
+        <div><dt>Для СМИ</dt><dd>press@example.ru</dd></div>
+      </dl>
+    </div>
+    <div class="map reveal" aria-label="Карта (заглушка)">
+      <div class="map__grid"></div>
+      <span class="map__pin"><svg><use href="#i-pin"/></svg></span>
+      <p>Здесь будет карта</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p class="footer__big">Трудись. Твори. Меняй мир!</p>
+    <div class="footer__row">
+      <span>© 2026 Форум трудовой молодёжи</span>
+      <a href="#top">Наверх ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
