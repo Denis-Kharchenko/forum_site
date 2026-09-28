@@ -1,3 +1,7 @@
+<?php
+require __DIR__ . '/lib/content.php';
+$content = load_content();
+?>
 <!doctype html>
 <html lang="ru">
 <head>
@@ -5,6 +9,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Форум работающей молодёжи — 23 октября 2026, Санкт-Петербург</title>
   <meta name="description" content="Форум работающей молодёжи Санкт-Петербурга. 23 октября 2026, 10:00–17:30, творческий кластер «АТС», ул. Некрасова, 7.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -121,7 +128,7 @@
   <div class="container">
     <div class="sec-head reveal">
       <span class="sec-num">01</span>
-      <h2 class="h2">О форуме — <em>голос работающей молодёжи</em></h2>
+      <h2 class="h2 h2--row">О форуме — <em>голос работающей молодёжи</em></h2>
     </div>
     <div class="about__grid">
       <div class="about__text reveal">
@@ -161,15 +168,10 @@
         <h2 class="h2">Программа <em>23 октября</em></h2>
         <p class="program__note">Предварительная программа — скоро опубликуем подробности.</p>
       </div>
-      <!-- ЗАГЛУШКА: заменить на предварительную программу -->
       <ol class="timeline reveal">
-        <li><time>10:00</time><div><b>Сбор и регистрация участников</b><span>Welcome-зона</span></div></li>
-        <li><time>11:00</time><div><b>Открытие форума</b><span>Главная сцена</span></div></li>
-        <li><time>12:00</time><div><b>Пленарная сессия</b><span>Главная сцена</span></div></li>
-        <li><time>13:30</time><div><b>Перерыв и нетворкинг</b><span>Лобби</span></div></li>
-        <li><time>14:30</time><div><b>Тематические сессии и мастер-классы</b><span>Залы кластера</span></div></li>
-        <li><time>17:00</time><div><b>Подведение итогов</b><span>Главная сцена</span></div></li>
-        <li><time>17:30</time><div><b>Завершение форума</b></div></li>
+<?php foreach ($content['program'] as $item): ?>
+        <li><time><?= e($item['time']) ?></time><div><b><?= e($item['title']) ?></b><?php if ($item['place'] !== ''): ?><span><?= e($item['place']) ?></span><?php endif; ?></div></li>
+<?php endforeach; ?>
       </ol>
       <a href="#" class="btn btn--blue btn--lg js-reg reveal">Зарегистрироваться <svg class="ico"><use href="#i-arrow"/></svg></a>
     </div>
@@ -181,21 +183,23 @@
   <div class="container">
     <div class="sec-head reveal">
       <span class="sec-num">03</span>
-      <h2 class="h2">Партнёры <em>форума</em></h2>
+      <h2 class="h2 h2--row">Партнёры <em>форума</em></h2>
+      <p class="sec-head__text">Организаторы и компании, которые вместе с нами создают форум.</p>
     </div>
-    <!-- --lw / --lh — размер логотипа внутри плитки, подобран под пропорции каждого знака -->
-    <ul class="partner-grid partner-grid--main">
-      <li class="partner partner--wide reveal" style="--lw:94%;--lh:62%"><img src="assets/partners/komitet.png" alt="Комитет по молодёжной политике и взаимодействию с общественными организациями Санкт-Петербурга" loading="lazy"></li>
-      <li class="partner reveal" style="--lw:56%;--lh:62%"><img src="assets/partners/vector.svg" alt="Центр поддержки молодёжных инициатив «Вектор»" loading="lazy"></li>
-      <li class="partner reveal" style="--lw:60%;--lh:58%"><img class="partner__img--invert" src="assets/partners/srm.png" alt="Совет работающей молодёжи Санкт-Петербурга" loading="lazy"></li>
+<?php
+$visible  = array_values(array_filter($content['partners'], fn($p) => !$p['hidden'] && $p['logo'] !== ''));
+$tiers    = [
+    'main' => array_values(array_filter($visible, fn($p) => $p['main'])),
+    'more' => array_values(array_filter($visible, fn($p) => !$p['main'])),
+];
+?>
+<?php foreach ($tiers as $tier => $list): if (!$list) continue; ?>
+    <ul class="partner-grid partner-grid--<?= $tier ?>">
+<?php foreach ($list as $i => $p): ?>
+      <li class="partner<?= ($tier === 'main' && $i === 0) ? ' partner--wide' : '' ?> reveal" style="--lw:94%;--lh:<?= (int)$p['size'] ?>%"><img<?= $p['invert'] ? ' class="partner__img--invert"' : '' ?> src="<?= e($p['logo']) ?>" alt="<?= e($p['name']) ?>" loading="lazy"></li>
+<?php endforeach; ?>
     </ul>
-    <ul class="partner-grid partner-grid--more">
-      <li class="partner reveal" style="--lh:66%"><img src="assets/partners/mts.png" alt="МТС" loading="lazy"></li>
-      <li class="partner reveal" style="--lh:62%"><img src="assets/partners/alfa.svg" alt="Альфа-Банк" loading="lazy"></li>
-      <li class="partner reveal" style="--lh:62%"><img src="assets/partners/vk.png" alt="VK" loading="lazy"></li>
-      <li class="partner reveal" style="--lh:62%"><img src="assets/partners/yandex.svg" alt="Яндекс" loading="lazy"></li>
-      <li class="partner reveal" style="--lw:84%;--lh:94%"><img src="assets/partners/spbso.png" alt="Студенческие отряды Санкт-Петербурга" loading="lazy"></li>
-    </ul>
+<?php endforeach; ?>
   </div>
 </section>
 
@@ -204,29 +208,22 @@
   <div class="container">
     <div class="sec-head reveal">
       <span class="sec-num">04</span>
-      <h2 class="h2">Спикеры <em>форума</em></h2>
+      <h2 class="h2 h2--row">Спикеры <em>форума</em></h2>
+      <p class="sec-head__text">Эксперты, руководители и практики, которые поделятся опытом.</p>
     </div>
-    <!-- ЗАГЛУШКИ: 6–8 спикеров с фото. Вместо <svg> вставить <img src="assets/speakers/…" alt="Имя Фамилия"> -->
     <div class="speaker-grid">
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
-      <article class="speaker reveal"><div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div><h3>Имя Фамилия</h3><p>Должность, организация</p></article>
+<?php foreach ($content['speakers'] as $s): ?>
+      <article class="speaker reveal"><div class="speaker__photo"><?php if ($s['photo'] !== ''): ?><img src="<?= e($s['photo']) ?>" alt="<?= e($s['name']) ?>" loading="lazy"><?php else: ?><svg aria-hidden="true"><use href="#i-person"/></svg><?php endif; ?></div><h3><?= e($s['name']) ?></h3><p><?= e($s['role']) ?></p></article>
+<?php endforeach; ?>
     </div>
+<?php if ($content['speakers_more']): ?>
     <h3 class="h3 reveal">А также</h3>
-    <!-- ЗАГЛУШКИ: остальные спикеры списком -->
     <ul class="speaker-list reveal">
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
-      <li><b>Имя Фамилия</b><span>Должность, организация</span></li>
+<?php foreach ($content['speakers_more'] as $s): ?>
+      <li><b><?= e($s['name']) ?></b><span><?= e($s['role']) ?></span></li>
+<?php endforeach; ?>
     </ul>
+<?php endif; ?>
   </div>
 </section>
 
@@ -256,17 +253,31 @@
     <div class="reveal">
       <span class="sec-num">06</span>
       <h2 class="h2">Контакты</h2>
-      <!-- ЗАГЛУШКИ: заменить на реальные контакты -->
+<?php $c = $content['contacts']; ?>
       <ul class="contact-list">
-        <li><svg class="ico"><use href="#i-chat"/></svg><div><small>Организатор</small><b>Название организации</b></div></li>
-        <li><svg class="ico"><use href="#i-phone"/></svg><div><small>Телефон</small><b>+7 (000) 000-00-00</b></div></li>
-        <li><svg class="ico"><use href="#i-mail"/></svg><div><small>Email</small><b>info@example.ru</b></div></li>
-        <li><svg class="ico"><use href="#i-mail"/></svg><div><small>Для СМИ и партнёров</small><b>press@example.ru</b></div></li>
+<?php if ($c['organizer'] !== ''): ?>
+        <li><svg class="ico"><use href="#i-chat"/></svg><div><small>Организатор</small><b><?= e($c['organizer']) ?></b></div></li>
+<?php endif; ?>
+<?php if ($c['phone'] !== ''): ?>
+        <li><svg class="ico"><use href="#i-phone"/></svg><div><small>Телефон</small><b><a href="<?= e(tel_href($c['phone'])) ?>"><?= e($c['phone']) ?></a></b></div></li>
+<?php endif; ?>
+<?php if ($c['email'] !== ''): ?>
+        <li><svg class="ico"><use href="#i-mail"/></svg><div><small>Email</small><b><a href="mailto:<?= e($c['email']) ?>"><?= e($c['email']) ?></a></b></div></li>
+<?php endif; ?>
+<?php if ($c['press'] !== ''): ?>
+        <li><svg class="ico"><use href="#i-mail"/></svg><div><small>Для СМИ и партнёров</small><b><a href="mailto:<?= e($c['press']) ?>"><?= e($c['press']) ?></a></b></div></li>
+<?php endif; ?>
       </ul>
+<?php if ($c['vk'] !== '' || $c['telegram'] !== ''): ?>
       <div class="socials">
-        <a class="social" href="#" aria-label="ВКонтакте (ссылка появится позже)">VK</a>
-        <a class="social" href="#" aria-label="Telegram (ссылка появится позже)">Telegram</a>
+<?php if ($c['vk'] !== ''): ?>
+        <a class="social" href="<?= e($c['vk']) ?>" target="_blank" rel="noopener">VK</a>
+<?php endif; ?>
+<?php if ($c['telegram'] !== ''): ?>
+        <a class="social" href="<?= e($c['telegram']) ?>" target="_blank" rel="noopener">Telegram</a>
+<?php endif; ?>
       </div>
+<?php endif; ?>
     </div>
     <div class="cta-card reveal">
       <svg class="cta-card__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>

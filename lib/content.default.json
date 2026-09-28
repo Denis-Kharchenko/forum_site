@@ -1,0 +1,45 @@
+{
+  "program": [
+    { "time": "10:00", "title": "Сбор и регистрация участников", "place": "Welcome-зона" },
+    { "time": "11:00", "title": "Открытие форума", "place": "Главная сцена" },
+    { "time": "12:00", "title": "Пленарная сессия", "place": "Главная сцена" },
+    { "time": "13:30", "title": "Перерыв и нетворкинг", "place": "Лобби" },
+    { "time": "14:30", "title": "Тематические сессии и мастер-классы", "place": "Залы кластера" },
+    { "time": "17:00", "title": "Подведение итогов", "place": "Главная сцена" },
+    { "time": "17:30", "title": "Завершение форума", "place": "" }
+  ],
+  "speakers": [
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" },
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" },
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" },
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" },
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" },
+    { "name": "Имя Фамилия", "role": "Должность, организация", "photo": "" }
+  ],
+  "speakers_more": [
+    { "name": "Имя Фамилия", "role": "Должность, организация" },
+    { "name": "Имя Фамилия", "role": "Должность, организация" },
+    { "name": "Имя Фамилия", "role": "Должность, организация" },
+    { "name": "Имя Фамилия", "role": "Должность, организация" },
+    { "name": "Имя Фамилия", "role": "Должность, организация" },
+    { "name": "Имя Фамилия", "role": "Должность, организация" }
+  ],
+  "partners": [
+    { "name": "Комитет по молодёжной политике и взаимодействию с общественными организациями Санкт-Петербурга", "logo": "assets/partners/komitet.png", "main": true, "hidden": false, "size": 62, "invert": false },
+    { "name": "Центр поддержки молодёжных инициатив «Вектор»", "logo": "assets/partners/vector.svg", "main": true, "hidden": false, "size": 62, "invert": false },
+    { "name": "Совет работающей молодёжи Санкт-Петербурга", "logo": "assets/partners/srm.png", "main": true, "hidden": false, "size": 58, "invert": true },
+    { "name": "МТС", "logo": "assets/partners/mts.png", "main": false, "hidden": false, "size": 66, "invert": false },
+    { "name": "Альфа-Банк", "logo": "assets/partners/alfa.svg", "main": false, "hidden": false, "size": 62, "invert": false },
+    { "name": "VK", "logo": "assets/partners/vk.png", "main": false, "hidden": false, "size": 62, "invert": false },
+    { "name": "Яндекс", "logo": "assets/partners/yandex.svg", "main": false, "hidden": false, "size": 62, "invert": false },
+    { "name": "Студенческие отряды Санкт-Петербурга", "logo": "assets/partners/spbso.png", "main": false, "hidden": false, "size": 94, "invert": false }
+  ],
+  "contacts": {
+    "organizer": "Название организации",
+    "phone": "+7 (000) 000-00-00",
+    "email": "info@example.ru",
+    "press": "press@example.ru",
+    "vk": "",
+    "telegram": ""
+  }
+}
