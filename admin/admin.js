@@ -3,7 +3,7 @@
   const app = document.getElementById('app');
   const statusEl = document.getElementById('status');
   const saveBtn = document.getElementById('save');
-  let tab = 'program';
+  let tab = 'settings';
   let dirty = false;
 
   /* ---------- Помощники ---------- */
@@ -31,6 +31,20 @@
   const checkbox = (obj, key, label) => h('label', { class: 'check' },
     h('input', { type: 'checkbox', checked: !!obj[key], onchange: e => { obj[key] = e.target.checked; markDirty(); render(); } }),
     h('span', {}, label));
+
+  const textarea = (obj, key, label, opts = {}) => h('label', { class: 'field field--wide' },
+    h('span', {}, label),
+    h('textarea', {
+      rows: opts.rows || 4, maxlength: opts.max || 3000, placeholder: opts.placeholder || '',
+      oninput: e => { obj[key] = e.target.value; markDirty(); }
+    }, obj[key] ?? ''),
+    opts.hint ? h('small', { class: 'hint' }, opts.hint) : '');
+
+  const choice = (obj, key, label, options) => h('fieldset', { class: 'field field--wide choice' },
+    h('legend', {}, label),
+    options.map(([value, title, hint]) => h('label', { class: 'choice__item' + (obj[key] === value ? ' is-active' : '') },
+      h('input', { type: 'radio', name: key, value, checked: obj[key] === value, onchange: () => { obj[key] = value; markDirty(); render(); } }),
+      h('b', {}, title), hint ? h('small', {}, hint) : '')));
 
   // Кнопки порядка и удаления для элемента списка
   const rowTools = (list, i, what) => h('div', { class: 'row__tools' },
@@ -72,12 +86,67 @@
         obj[key] ? h('button', { type: 'button', class: 'link', onclick: () => { obj[key] = ''; markDirty(); render(); } }, 'Убрать') : ''));
   };
 
+  const uploadMany = async (files, kind, onEach) => {
+    let done = 0;
+    for (const f of files) {
+      setStatus(`Загружаю фото ${done + 1} из ${files.length}…`);
+      const path = await upload(f, kind);
+      if (!path) return; // сообщение об ошибке уже показано
+      onEach(path); done++;
+    }
+    dirty = true;
+    setStatus(`Загружено фото: ${done}. Не забудьте сохранить`, 'warn');
+    render();
+  };
+
   const section = (title, hint, ...body) => h('section', { class: 'card' },
     h('div', { class: 'card__head' }, h('h2', {}, title), hint ? h('p', { class: 'muted' }, hint) : ''),
     ...body);
 
   /* ---------- Вкладки ---------- */
   const views = {
+    settings: () => [
+      section('Событие', 'Дата и время начала управляют таймером на сайте.',
+        h('div', { class: 'grid2' },
+          input(data.settings, 'date', 'Дата', { type: 'date', max: 10 }),
+          h('div', { class: 'grid2 grid2--tight' },
+            input(data.settings, 'time_start', 'Начало', { type: 'time', max: 5 }),
+            input(data.settings, 'time_end', 'Окончание', { type: 'time', max: 5 })),
+          input(data.settings, 'venue', 'Площадка', { max: 120 }),
+          input(data.settings, 'address', 'Адрес', { max: 200 })),
+        h('p', { class: 'muted small' }, 'Метка на карте стоит на здании «АТС» (Некрасова, 3–5). Если площадка сменится, напишите разработчику — карту нужно перенастроить.')),
+      section('Регистрация', 'Ссылка на форму регистрации на платформе Росмолодёжи. Пока поле пустое, кнопки «Зарегистрироваться» показывают «Регистрация откроется совсем скоро».',
+        input(data.settings, 'reg_url', 'Ссылка на регистрацию', { type: 'url', placeholder: 'https://…', max: 500, wide: true })),
+      section('Режим сайта', '',
+        choice(data.settings, 'mode', 'Что показывать', [
+          ['before', 'До форума', 'Таймер и кнопки регистрации'],
+          ['after', 'Форум прошёл', 'Вместо таймера — благодарность, кнопки ведут к фотографиям. Тексты благодарности — во вкладке «Тексты»']
+        ])),
+      section('Объявление вверху сайта', 'Красная плашка над меню. Посетитель может её закрыть — после изменения текста она покажется снова.',
+        checkbox(data.announcement, 'enabled', 'Показывать объявление'),
+        h('div', { class: 'grid2' + (data.announcement.enabled ? '' : ' is-disabled') },
+          input(data.announcement, 'text', 'Текст объявления', { max: 200, wide: true, placeholder: 'Регистрация на форум открыта!' }),
+          input(data.announcement, 'link_text', 'Текст кнопки (необязательно)', { max: 40, placeholder: 'Зарегистрироваться' }),
+          input(data.announcement, 'link_url', 'Ссылка кнопки', { max: 500, placeholder: 'пусто — ссылка на регистрацию' })))
+    ],
+
+    texts: () => [
+      section('О форуме', 'Пустая строка между абзацами — новый абзац.',
+        input(data.texts, 'about_title', 'Подзаголовок (синим после «О форуме —»)', { max: 120, wide: true }),
+        textarea(data.texts, 'about_lead', 'Вводный абзац (крупным шрифтом)', { rows: 3, max: 600 }),
+        textarea(data.texts, 'about_text', 'Основной текст', { rows: 10, max: 3000 })),
+      section('Подписи к разделам', 'Короткие пояснения рядом с заголовками. Пустое поле — подпись не показывается.',
+        input(data.texts, 'program_note', 'Под заголовком «Программа»', { max: 200, wide: true }),
+        input(data.texts, 'partners_note', 'Рядом с заголовком «Партнёры»', { max: 200, wide: true }),
+        input(data.texts, 'speakers_note', 'Рядом с заголовком «Спикеры»', { max: 200, wide: true })),
+      section('Синяя карточка в «Контактах»', 'Показывается в режиме «До форума».',
+        input(data.texts, 'cta_title', 'Заголовок', { max: 120, wide: true }),
+        input(data.texts, 'cta_text', 'Текст', { max: 300, wide: true })),
+      section('После форума', 'Показывается в режиме «Форум прошёл»: на первом экране вместо таймера и в синей карточке.',
+        input(data.texts, 'thanks_title', 'Заголовок', { max: 120, wide: true }),
+        input(data.texts, 'thanks_text', 'Текст', { max: 300, wide: true }))
+    ],
+
     program: () => section('Программа', 'Пункты показываются на сайте в этом порядке.',
       h('div', { class: 'list' }, data.program.map((it, i) => h('div', { class: 'row' },
         h('div', { class: 'row__num' }, String(i + 1)),
@@ -95,19 +164,21 @@
           imagePicker(it, 'photo', 'speaker', 'Загрузить фото'),
           h('div', { class: 'row__fields' },
             input(it, 'name', 'Имя и фамилия', { max: 120 }),
-            input(it, 'role', 'Должность, организация', { max: 200 })),
+            input(it, 'role', 'Должность, организация', { max: 200 }),
+            textarea(it, 'bio', 'Описание (необязательно)', { rows: 3, max: 1500, hint: 'Если заполнено — на сайте карточка открывается по клику' })),
           rowTools(data.speakers, i, 'спикера')))),
         data.speakers.length < 12
-          ? h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => { data.speakers.push({ name: '', role: '', photo: '' }); markDirty(); render(); } }, '+ Добавить спикера')
+          ? h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => { data.speakers.push({ name: '', role: '', photo: '', bio: '' }); markDirty(); render(); } }, '+ Добавить спикера')
           : ''),
       section('«А также» — списком без фото', '',
         h('div', { class: 'list' }, data.speakers_more.map((it, i) => h('div', { class: 'row' },
           h('div', { class: 'row__num' }, String(i + 1)),
           h('div', { class: 'row__fields' },
             input(it, 'name', 'Имя и фамилия', { max: 120 }),
-            input(it, 'role', 'Должность, организация', { max: 200 })),
+            input(it, 'role', 'Должность, организация', { max: 200 }),
+            textarea(it, 'bio', 'Описание (необязательно)', { rows: 2, max: 1500 })),
           rowTools(data.speakers_more, i, 'спикера')))),
-        h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => { data.speakers_more.push({ name: '', role: '' }); markDirty(); render(); } }, '+ Добавить в список'))
+        h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => { data.speakers_more.push({ name: '', role: '', bio: '' }); markDirty(); render(); } }, '+ Добавить в список'))
     ],
 
     partners: () => section('Партнёры', '«Первый ряд» — крупные плитки. Порядок на сайте такой же, как здесь. Скрытые партнёры на сайте не показываются.',
@@ -115,7 +186,7 @@
         h('div', { class: 'row__num' }, String(i + 1)),
         imagePicker(it, 'logo', 'partner', 'Загрузить логотип'),
         h('div', { class: 'row__fields' },
-          input(it, 'name', 'Название (для подсказки и поисковиков)', { max: 200, wide: true }),
+          input(it, 'name', 'Название (показывается при наведении)', { max: 200, wide: true }),
           h('div', { class: 'checks' },
             checkbox(it, 'main', 'Первый ряд'),
             checkbox(it, 'hidden', 'Скрыть'),
@@ -126,6 +197,17 @@
               oninput: e => { it.size = +e.target.value; e.target.previousSibling.textContent = 'Размер логотипа: ' + it.size + '%'; markDirty(); } }))),
         rowTools(data.partners, i, 'партнёра')))),
       h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => { data.partners.push({ name: '', logo: '', main: false, hidden: false, size: 60, invert: false }); markDirty(); render(); } }, '+ Добавить партнёра')),
+
+    gallery: () => section('Галерея', 'Блок «Фото с форума» появится на сайте, как только здесь будет хотя бы одно фото. Можно выбрать сразу несколько файлов. Большие фото уменьшаются автоматически.',
+      h('label', { class: 'btn' }, '+ Загрузить фото',
+        h('input', { type: 'file', accept: '.jpg,.jpeg,.png,.webp', multiple: true, hidden: true,
+          onchange: e => uploadMany([...e.target.files], 'gallery', path => data.gallery.push({ src: path, caption: '' })) })),
+      data.gallery.length
+        ? h('div', { class: 'gallery-admin' }, data.gallery.map((it, i) => h('div', { class: 'gallery-admin__item' },
+            h('div', { class: 'gallery-admin__img' }, it.src ? h('img', { src: '../' + it.src, alt: '' }) : ''),
+            input(it, 'caption', 'Подпись', { max: 200 }),
+            rowTools(data.gallery, i, 'фото'))))
+        : h('p', { class: 'muted' }, 'Фото пока нет.')),
 
     contacts: () => section('Контакты', 'Пустые поля на сайте не показываются.',
       h('div', { class: 'grid2' },

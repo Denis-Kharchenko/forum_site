@@ -42,6 +42,8 @@ button, input { font: inherit; }
 .auth__card label { display: grid; gap: 6px; font-weight: 700; font-size: 14px; }
 .auth__card input { min-height: 46px; padding: 8px 12px; border: 2px solid var(--line); }
 .auth__card input:focus { border-color: var(--blue); outline: none; }
+.auth__card .check { display: flex; gap: 8px; font-weight: 600; }
+.auth__card .check input { min-height: 0; width: 18px; height: 18px; padding: 0; }
 
 /* Шапка */
 .bar {
@@ -105,3 +107,27 @@ button, input { font: inherit; }
   .row__fields, .row__fields--program, .grid2 { grid-template-columns: 1fr; }
   .picker { width: 160px; justify-items: start; }
 }
+
+/* Многострочные поля, выбор режима, галерея */
+.field textarea { padding: 8px 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 500 15px/1.5 var(--f-body); resize: vertical; min-height: 60px; }
+.field textarea:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 2px var(--blue-soft); }
+.hint { font-weight: 500; color: var(--ink-2); }
+.card > .field, .card > .field--wide { width: 100%; }
+.grid2--tight { gap: 10px; }
+.is-disabled { opacity: .5; }
+.choice { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice legend { padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.choice__item { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: start; padding: 14px 16px; border: 2px solid var(--line); background: #fff; cursor: pointer; color: var(--ink); }
+.choice__item input { grid-row: span 2; margin-top: 3px; width: 18px; height: 18px; accent-color: var(--blue); }
+.choice__item b { font-size: 16px; }
+.choice__item small { font-weight: 500; color: var(--ink-2); }
+.choice__item.is-active { border-color: var(--blue); background: var(--blue-soft); }
+.gallery-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.gallery-admin__item { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--line); background: #fbfbfd; }
+.gallery-admin__img { aspect-ratio: 4 / 3; background: var(--blue-soft); overflow: hidden; }
+.gallery-admin__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery-admin__item .row__tools { justify-content: flex-end; }
+@media (max-width: 760px) { .choice { grid-template-columns: 1fr; } }
+.card > .btn, .card > label.btn, .card > .check { justify-self: start; }
+.tab { padding: 6px 10px; }
+@media (min-width: 1200px) { .bar { flex-wrap: nowrap; } }

@@ -77,10 +77,16 @@ function is_logged_in(): bool
     return !empty($_SESSION['admin']);
 }
 
-function check_csrf(): void
+function csrf_ok(): bool
 {
     $token = $_POST['csrf'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
-    if (!is_string($token) || !hash_equals($_SESSION['csrf'], $token)) {
+    return is_string($token) && hash_equals($_SESSION['csrf'], $token);
+}
+
+// Для запросов из JS (сохранение, загрузка) — ответ в JSON
+function check_csrf(): void
+{
+    if (!csrf_ok()) {
         json_out(['ok' => false, 'error' => 'Сессия устарела, обновите страницу'], 403);
     }
 }
@@ -120,6 +126,9 @@ function handle_upload(string $kind): array
     $name = $kind . '-' . date('Ymd') . '-' . bin2hex(random_bytes(5)) . '.' . $ext;
     $dest = UPLOADS_DIR . '/' . $name;
 
+    if ($ext === 'svg' && $kind !== 'partner') {
+        return ['ok' => false, 'error' => 'Для фото подходят JPG, PNG или WebP'];
+    }
     if ($ext === 'svg') {
         $svg = (string)file_get_contents($f['tmp_name']);
         if (!preg_match('/<svg[\s>]/i', $svg)
@@ -136,7 +145,7 @@ function handle_upload(string $kind): array
         return ['ok' => false, 'error' => 'Файл не похож на картинку'];
     }
 
-    $max = $kind === 'speaker' ? 900 : 700;
+    $max = ['speaker' => 900, 'partner' => 700, 'gallery' => 1800][$kind];
     if (!resize_image($f['tmp_name'], $dest, $ext, $info[0], $info[1], $max)) {
         move_uploaded_file($f['tmp_name'], $dest);
     }
@@ -176,11 +185,15 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hasPassword = is_file(AUTH_FILE);
 
-    if ($action === 'setup' && !$hasPassword) {
-        check_csrf();
-        $p1 = (string)($_POST['password'] ?? '');
-        $p2 = (string)($_POST['password2'] ?? '');
-        if (strlen($p1) < 10) {
+    $formCsrfOk = csrf_ok();
+
+    if (in_array($action, ['setup', 'login'], true) && !$formCsrfOk) {
+        $error = 'Страница была открыта слишком долго. Обновите её и попробуйте снова';
+    } elseif ($action === 'setup' && !$hasPassword) {
+        // пробелы по краям — почти всегда случайность при копировании
+        $p1 = trim((string)($_POST['password'] ?? ''));
+        $p2 = trim((string)($_POST['password2'] ?? ''));
+        if (mb_strlen($p1) < 10) {
             $error = 'Пароль должен быть не короче 10 символов';
         } elseif ($p1 !== $p2) {
             $error = 'Пароли не совпадают';
@@ -191,30 +204,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_self();
         }
     } elseif ($action === 'login' && $hasPassword) {
-        check_csrf();
         if ($left = is_locked()) {
             $error = 'Слишком много попыток. Попробуйте через ' . ceil($left / 60) . ' мин.';
         } else {
             $hash = php_store_read(AUTH_FILE)['hash'] ?? '';
-            $ok = $hash !== '' && password_verify((string)($_POST['password'] ?? ''), $hash);
+            $raw = (string)($_POST['password'] ?? '');
+            // сначала как есть (пароль мог быть создан с пробелом), затем без пробелов по краям
+            $ok = $hash !== '' && (password_verify($raw, $hash) || ($raw !== trim($raw) && password_verify(trim($raw), $hash)));
             register_attempt($ok);
             if ($ok) {
                 session_regenerate_id(true);
                 $_SESSION['admin'] = true;
                 redirect_self();
             }
-            $error = 'Неверный пароль';
+            $error = 'Неверный пароль. Проверьте раскладку клавиатуры и Caps Lock';
         }
     } elseif ($action === 'logout') {
-        check_csrf();
-        $_SESSION = [];
-        session_destroy();
+        if ($formCsrfOk) {
+            $_SESSION = [];
+            session_destroy();
+        }
         redirect_self();
     } elseif ($action === 'save' || $action === 'upload') {
         if (!is_logged_in()) json_out(['ok' => false, 'error' => 'Войдите заново'], 401);
         check_csrf();
         if ($action === 'upload') {
-            $kind = ($_POST['kind'] ?? '') === 'partner' ? 'partner' : 'speaker';
+            $kind = in_array($_POST['kind'] ?? '', ['partner', 'gallery'], true) ? $_POST['kind'] : 'speaker';
             $res = handle_upload($kind);
             json_out($res, $res['ok'] ? 200 : 400);
         }
@@ -254,18 +269,27 @@ $csrf = $_SESSION['csrf'];
         <input type="hidden" name="action" value="login">
       <?php endif; ?>
       <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
+      <label class="check"><input type="checkbox" id="showPass"> <span>Показать пароль</span></label>
       <?php if ($error): ?><p class="error" role="alert"><?= e($error) ?></p><?php endif; ?>
       <button class="btn" type="submit"><?= $needsSetup ? 'Создать пароль и войти' : 'Войти' ?></button>
       <a class="muted small" href="../">← На сайт</a>
     </form>
   </main>
+  <script>
+    document.getElementById('showPass').addEventListener('change', e => {
+      document.querySelectorAll('.auth__card input[name^="password"]').forEach(i => { i.type = e.target.checked ? 'text' : 'password'; });
+    });
+  </script>
 <?php else: ?>
   <header class="bar">
     <b class="bar__title">Админка форума</b>
     <nav class="tabs" role="tablist">
-      <button type="button" class="tab is-active" data-tab="program">Программа</button>
+      <button type="button" class="tab is-active" data-tab="settings">Настройки</button>
+      <button type="button" class="tab" data-tab="texts">Тексты</button>
+      <button type="button" class="tab" data-tab="program">Программа</button>
       <button type="button" class="tab" data-tab="speakers">Спикеры</button>
       <button type="button" class="tab" data-tab="partners">Партнёры</button>
+      <button type="button" class="tab" data-tab="gallery">Галерея</button>
       <button type="button" class="tab" data-tab="contacts">Контакты</button>
     </nav>
     <div class="bar__actions">

@@ -98,12 +98,88 @@ function list_field($v, callable $fn, int $max = 60): array
     return $out;
 }
 
+// Многострочный текст: сохраняем переносы строк, убираем прочие управляющие символы
+function text_field($v, int $max = 3000): string
+{
+    $s = str_replace(["\r\n", "\r"], "\n", is_scalar($v) ? (string)$v : '');
+    $s = preg_replace('/[\x00-\x09\x0B-\x1F\x7F]/u', ' ', $s) ?? '';
+    return mb_substr(trim($s), 0, $max);
+}
+
+// Абзацы из многострочного текста (разделитель — пустая строка)
+function paragraphs(string $text): array
+{
+    return array_values(array_filter(array_map('trim', preg_split('/\n\s*\n/', $text) ?: []), 'strlen'));
+}
+
+// Недостающие разделы и поля берём из значений по умолчанию —
+// так старые сохранения продолжают работать после добавления новых полей
+function with_defaults(array $d): array
+{
+    static $def = null;
+    $def ??= json_decode((string)file_get_contents(DEFAULT_FILE), true) ?: [];
+    foreach ($def as $key => $value) {
+        if (!array_key_exists($key, $d)) {
+            $d[$key] = $value;
+        } elseif (is_array($value) && !array_is_list($value) && is_array($d[$key])) {
+            $d[$key] += $value;
+        }
+    }
+    return $d;
+}
+
+const MONTHS_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+// «2026-10-23» → «23 октября 2026»
+function date_human(string $iso, bool $withYear = true): string
+{
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $iso, $m)) return '';
+    return (int)$m[3] . ' ' . MONTHS_GEN[(int)$m[2] - 1] . ($withYear ? ' ' . $m[1] : '');
+}
+
 function normalize_content(array $d): array
 {
+    $d = with_defaults($d);
     $c = is_array($d['contacts'] ?? null) ? $d['contacts'] : [];
+    $s = is_array($d['settings'] ?? null) ? $d['settings'] : [];
+    $a = is_array($d['announcement'] ?? null) ? $d['announcement'] : [];
+    $t = is_array($d['texts'] ?? null) ? $d['texts'] : [];
     $email = fn($v) => filter_var(str_field($v, 120), FILTER_VALIDATE_EMAIL) ?: '';
+    $time = fn($v, $fallback) => preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', str_field($v, 5)) ? str_field($v, 5) : $fallback;
+    $date = str_field($s['date'] ?? '', 10);
 
     return [
+        'settings' => [
+            'reg_url'    => url_field($s['reg_url'] ?? ''),
+            'date'       => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) && checkdate((int)substr($date, 5, 2), (int)substr($date, 8, 2), (int)substr($date, 0, 4)) ? $date : '2026-10-23',
+            'time_start' => $time($s['time_start'] ?? '', '10:00'),
+            'time_end'   => $time($s['time_end'] ?? '', '17:30'),
+            'venue'      => str_field($s['venue'] ?? '', 120),
+            'address'    => str_field($s['address'] ?? '', 200),
+            'mode'       => ($s['mode'] ?? '') === 'after' ? 'after' : 'before',
+        ],
+        'announcement' => [
+            'enabled'   => !empty($a['enabled']),
+            'text'      => str_field($a['text'] ?? '', 200),
+            'link_text' => str_field($a['link_text'] ?? '', 40),
+            'link_url'  => url_field($a['link_url'] ?? '') ?: (preg_match('/^#[a-z-]+$/', str_field($a['link_url'] ?? '', 40)) ? str_field($a['link_url'] ?? '', 40) : ''),
+        ],
+        'texts' => [
+            'about_title' => str_field($t['about_title'] ?? '', 120),
+            'about_lead'  => text_field($t['about_lead'] ?? '', 600),
+            'about_text'  => text_field($t['about_text'] ?? '', 3000),
+            'program_note'  => str_field($t['program_note'] ?? '', 200),
+            'partners_note' => str_field($t['partners_note'] ?? '', 200),
+            'speakers_note' => str_field($t['speakers_note'] ?? '', 200),
+            'cta_title'   => str_field($t['cta_title'] ?? '', 120),
+            'cta_text'    => str_field($t['cta_text'] ?? '', 300),
+            'thanks_title' => str_field($t['thanks_title'] ?? '', 120),
+            'thanks_text'  => str_field($t['thanks_text'] ?? '', 300),
+        ],
+        'gallery' => list_field($d['gallery'] ?? [], fn($i) => [
+            'src'     => image_field($i['src'] ?? ''),
+            'caption' => str_field($i['caption'] ?? '', 200),
+        ], 120),
         'program' => list_field($d['program'] ?? [], fn($i) => [
             'time'  => str_field($i['time'] ?? '', 20),
             'title' => str_field($i['title'] ?? '', 200),
@@ -113,10 +189,12 @@ function normalize_content(array $d): array
             'name'  => str_field($i['name'] ?? '', 120),
             'role'  => str_field($i['role'] ?? '', 200),
             'photo' => image_field($i['photo'] ?? ''),
+            'bio'   => text_field($i['bio'] ?? '', 1500),
         ], 12),
         'speakers_more' => list_field($d['speakers_more'] ?? [], fn($i) => [
             'name' => str_field($i['name'] ?? '', 120),
             'role' => str_field($i['role'] ?? '', 200),
+            'bio'  => text_field($i['bio'] ?? '', 1500),
         ]),
         'partners' => list_field($d['partners'] ?? [], fn($i) => [
             'name'   => str_field($i['name'] ?? '', 200),
