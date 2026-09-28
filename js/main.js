@@ -3,8 +3,10 @@
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- Дата форума (заглушка — поменять) ---------- */
-  const FORUM_DATE = new Date('2026-11-20T10:00:00+03:00');
+  /* ---------- Настройки ---------- */
+  const FORUM_DATE = new Date('2026-10-23T10:00:00+03:00');
+  // Ссылка на регистрацию на платформе Росмолодёжи. Пока пусто — кнопки показывают подсказку.
+  const REG_URL = '';
 
   /* ---------- Header / burger ---------- */
   const header = $('#header');
@@ -24,7 +26,7 @@
   onScroll();
 
   /* ---------- Активный пункт меню ---------- */
-  const links = new Map($$('a', nav).map(a => [a.getAttribute('href').slice(1), a]));
+  const links = new Map($$('a[href^="#"]:not(.js-reg)', nav).map(a => [a.getAttribute('href').slice(1), a]));
   const spy = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -34,23 +36,29 @@
   }, { rootMargin: '-45% 0px -50% 0px' });
   links.forEach((_, id) => { const s = document.getElementById(id); if (s) spy.observe(s); });
 
-  /* ---------- Спикеры (заглушки) ---------- */
-  const speakers = [
-    ['Имя Фамилия', 'Руководитель, организация'],
-    ['Имя Фамилия', 'Эксперт по молодёжной политике'],
-    ['Имя Фамилия', 'Предприниматель, основатель проекта'],
-    ['Имя Фамилия', 'Деятель культуры'],
-    ['Имя Фамилия', 'Наставник трека «Команда и лидерство»'],
-    ['Имя Фамилия', 'Представитель работодателя'],
-    ['Имя Фамилия', 'Учёный, исследователь'],
-    ['Имя Фамилия', 'Лидер молодёжного движения'],
-  ];
-  $('.speaker-grid').innerHTML = speakers.map(([name, role]) => `
-    <article class="speaker reveal">
-      <div class="speaker__photo"><svg aria-hidden="true"><use href="#i-person"/></svg></div>
-      <h4>${name}</h4>
-      <p>${role}</p>
-    </article>`).join('');
+  /* ---------- Подсказка ---------- */
+  const toast = $('#toast');
+  let toastTimer;
+  const showToast = text => {
+    toast.textContent = text;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 4000);
+  };
+
+  /* ---------- Кнопки регистрации ---------- */
+  $$('.js-reg').forEach(a => {
+    if (REG_URL) {
+      a.href = REG_URL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+    } else {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        showToast('Регистрация на платформе Росмолодёжи откроется совсем скоро');
+      });
+    }
+  });
 
   /* ---------- Появление при скролле ---------- */
   const reveals = $$('.reveal');
@@ -71,24 +79,6 @@
     reveals.forEach(el => io.observe(el));
   }
 
-  /* ---------- Счётчики ---------- */
-  const counters = $$('[data-count]');
-  const runCounter = el => {
-    const target = +el.dataset.count;
-    if (reduced) { el.textContent = target; return; }
-    const t0 = performance.now(), dur = 1400;
-    const tick = t => {
-      const p = Math.min((t - t0) / dur, 1);
-      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  };
-  const cio = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { runCounter(e.target); cio.unobserve(e.target); } });
-  }, { threshold: 0.6 });
-  counters.forEach(c => cio.observe(c));
-
   /* ---------- Обратный отсчёт ---------- */
   const cd = { d: $('[data-cd="d"]'), h: $('[data-cd="h"]'), m: $('[data-cd="m"]') };
   const pad = n => String(n).padStart(2, '0');
@@ -100,33 +90,4 @@
   };
   updateCountdown();
   setInterval(updateCountdown, 30000);
-
-  /* ---------- Вкладки расписания ---------- */
-  const tabs = $$('.tab');
-  tabs.forEach(tab => tab.addEventListener('click', () => {
-    tabs.forEach(t => { t.classList.toggle('is-active', t === tab); t.setAttribute('aria-selected', String(t === tab)); });
-    $$('[data-day-panel]').forEach(p => { p.hidden = p.dataset.dayPanel !== tab.dataset.day; });
-  }));
-
-  /* ---------- Форма (демо) ---------- */
-  const form = $('#regForm');
-  const validate = input => {
-    const field = input.closest('.field');
-    if (!field) return input.checkValidity();
-    let msg = '';
-    if (input.validity.valueMissing) msg = 'Заполните это поле';
-    else if (input.validity.typeMismatch) msg = 'Проверьте формат email';
-    field.classList.toggle('has-error', !!msg);
-    $('.err', field).textContent = msg;
-    return !msg;
-  };
-  $$('input[required]', form).forEach(i => i.addEventListener('blur', () => validate(i)));
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const required = $$('input[required]', form);
-    const bad = required.filter(i => !validate(i));
-    if (bad.length) { bad[0].focus(); return; }
-    $('.form__ok', form).hidden = false;
-    form.reset();
-  });
 })();
