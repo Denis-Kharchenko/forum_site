@@ -25,6 +25,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: hidden; overflow-x: clip; }
 html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 12px); }
 body {
   margin: 0;
@@ -35,6 +36,7 @@ body {
   background: var(--paper);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
@@ -358,7 +360,7 @@ html { scroll-padding-top: calc(var(--header-h) + var(--announce-h) + 12px); }
 .partner { position: relative; }
 .partner__tip {
   position: absolute; left: 50%; bottom: calc(100% + 10px); z-index: 5;
-  width: max-content; max-width: min(320px, 90vw);
+  width: max-content; max-width: min(320px, calc(100% + 16px));
   padding: 8px 12px; background: var(--ink); color: #fff;
   font-size: 13px; font-weight: 600; line-height: 1.35; text-align: center;
   opacity: 0; visibility: hidden; transform: translate(-50%, 6px);
