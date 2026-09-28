@@ -476,15 +476,28 @@ html { scroll-padding-top: calc(var(--header-h) + var(--announce-h) + 12px); }
 @media (max-width: 1080px) {
   .burger { display: flex; }
   .header__cta { display: none; }
+  /* Без размытия шапка перестаёт быть «контейнером» для меню — позиция одинакова во всех браузерах, включая Safari */
+  .header { background: var(--paper); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  /* Меню выезжает под шапкой; шапка всегда поверх, поэтому кнопка не теряется на синем фоне */
   .nav {
-    position: fixed; inset: var(--header-h) 0 auto; flex-direction: column; gap: 0;
+    position: fixed; inset: calc(var(--announce-h) + var(--header-h)) 0 auto; flex-direction: column; gap: 0;
+    max-height: calc(100dvh - var(--announce-h) - var(--header-h)); overflow-y: auto; overscroll-behavior: contain;
     background: var(--blue); padding: 12px var(--gutter) 28px;
-    transform: translateY(-120%); transition: transform .35s var(--ease); z-index: -1;
+    box-shadow: 0 24px 40px rgba(14, 38, 148, .28);
+    transform: translateY(-120%); visibility: hidden;
+    transition: transform .35s var(--ease), visibility 0s .35s; z-index: -1;
   }
-  .nav.is-open { transform: none; }
+  .nav.is-open { transform: none; visibility: visible; transition: transform .35s var(--ease); }
   .nav a { color: #fff; font-size: 26px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.2); }
   .nav a::after { display: none; }
-  .nav a:hover, .nav a.is-active { color: #fff; opacity: .75; }
+  .nav a:hover { color: #fff; opacity: .8; }
+  .nav a.is-active { color: #fff; opacity: 1; box-shadow: inset 4px 0 0 #fff; padding-left: 14px; }
+  /* Кнопка меню: крупнее, с тенью; в открытом состоянии — тёмная, чтобы отличаться от синего меню */
+  .burger { width: 52px; height: 52px; padding: 15px 13px; box-shadow: 0 4px 14px rgba(14, 38, 148, .35); transition: background .2s; }
+  .burger:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+  .burger[aria-expanded="true"] { background: var(--ink); }
+  .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+  .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
   .nav .nav__reg { display: block; margin-top: 16px; padding: 14px 0; border: 0; background: #fff; color: var(--blue); text-align: center; }
   .nav .nav__reg:hover { color: var(--blue); opacity: .9; }
 
