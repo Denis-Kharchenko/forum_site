@@ -15,7 +15,7 @@ $content = load_content();
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=<?= asset_v('css/style.css') ?>">
 </head>
 <body>
 
@@ -302,6 +302,6 @@ $tiers    = [
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="js/main.js"></script>
+<script src="js/main.js?v=<?= asset_v('js/main.js') ?>"></script>
 </body>
 </html>

@@ -237,7 +237,7 @@ $csrf = $_SESSION['csrf'];
   <title>Админка — Форум работающей молодёжи</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=<?= asset_v('admin/admin.css') ?>">
 </head>
 <body>
 <?php if (!is_logged_in()): ?>
@@ -278,7 +278,7 @@ $csrf = $_SESSION['csrf'];
   <main class="wrap" id="app"></main>
   <script id="content-data" type="application/json"><?= json_encode(load_content(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
   <script>window.CSRF = <?= json_encode($csrf) ?>;</script>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=<?= asset_v('admin/admin.js') ?>"></script>
 <?php endif; ?>
 </body>
 </html>

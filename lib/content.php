@@ -142,3 +142,9 @@ function tel_href(string $phone): string
     $digits = preg_replace('/[^\d+]/', '', $phone) ?? '';
     return $digits !== '' ? 'tel:' . $digits : '';
 }
+
+// Версия файла для адреса (?v=…): после изменения браузер скачает новый файл, а не возьмёт старый из кэша
+function asset_v(string $path): string
+{
+    return (string)(@filemtime(ROOT_DIR . '/' . $path) ?: 0);
+}
