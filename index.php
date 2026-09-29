@@ -1,6 +1,16 @@
 <?php
 require __DIR__ . '/lib/content.php';
 $content = load_content();
+
+// Вторая версия дизайна открывается по адресу /v2/ (v2/index.php подключает эту же страницу).
+// Страница там лежит на уровень глубже, поэтому относительные пути к файлам получают префикс «../».
+$V2 = defined('SITE_V2');
+$R  = $V2 ? '../' : '';
+function asset(string $p): string
+{
+    global $R;
+    return $p === '' || preg_match('~^([a-z][a-z0-9+.-]*:|//|#)~i', $p) ? $p : $R . $p;
+}
 $set   = $content['settings'];
 $txt   = $content['texts'];
 $after = $set['mode'] === 'after';
@@ -35,15 +45,20 @@ function reg_button(string $class, string $label, bool $arrow = true): string
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Форум работающей молодёжи — <?= e($dateFull) ?>, Санкт-Петербург</title>
   <meta name="description" content="Форум работающей молодёжи Санкт-Петербурга. <?= e($dateFull . ', ' . $timeRange . ', ' . $set['venue'] . ', ' . $set['address']) ?>.">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" href="<?= $R ?>favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="<?= $R ?>favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="<?= $R ?>apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=<?= asset_v('css/style.css') ?>">
+  <link rel="stylesheet" href="<?= $R ?>css/style.css?v=<?= asset_v('css/style.css') ?>">
+<?php if ($V2): ?>
+  <link rel="stylesheet" href="../css/v2.css?v=<?= asset_v('css/v2.css') ?>">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://forum-rm2026.ru/">
+<?php endif; ?>
 </head>
-<body data-forum-start="<?= e($set['date'] . 'T' . $set['time_start'] . ':00+03:00') ?>" data-reg-url="<?= e($set['reg_url']) ?>">
+<body<?= $V2 ? ' class="v2"' : '' ?> data-forum-start="<?= e($set['date'] . 'T' . $set['time_start'] . ':00+03:00') ?>" data-reg-url="<?= e($set['reg_url']) ?>">
 
 <!-- SVG-символы -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -79,7 +94,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
 <header class="header" id="header">
   <div class="container header__inner">
     <a href="#top" class="logo" aria-label="На главную">
-      <span class="logo__mark" aria-hidden="true"><svg><use href="#i-gear"/></svg></span>
+      <?php if ($V2): ?><span class="logo__mark" aria-hidden="true"><!-- шестерёнка вращается, вырез под буквы и блик неподвижны --><svg class="logo__svg" viewBox="230 243 620 594" aria-hidden="true" focusable="false"><defs><path id="lm-gear" d="M759.5 539A232.5 232.5 0 1 1 294.5 539A232.5 232.5 0 1 1 759.5 539ZM701 539A174 174 0 1 0 353 539A174 174 0 1 0 701 539ZM471.7 314L482 249.5L572 249.5L582.3 314ZM350.01 389.48L320.43 331.24L393.24 278.34L439.49 324.47ZM295.92 522.06L237.76 492.34L265.57 406.74L330.1 416.88ZM330.1 661.12L265.57 671.26L237.76 585.66L295.92 555.94ZM439.49 753.53L393.24 799.66L320.43 746.76L350.01 688.52ZM582.3 764L572 828.5L482 828.5L471.7 764ZM703.99 688.52L733.57 746.76L660.76 799.66L614.51 753.53ZM758.08 555.94L816.24 585.66L788.43 671.26L723.9 661.12ZM723.9 416.88L788.43 406.74L816.24 492.34L758.08 522.06ZM614.51 324.47L660.76 278.34L733.57 331.24L703.99 389.48Z"/><mask id="lm-cut" maskUnits="userSpaceOnUse" x="230" y="243" width="620" height="594"><rect x="230" y="243" width="620" height="594" fill="#fff"/><rect x="581.5" y="414.5" width="270" height="425" fill="#000"/></mask><clipPath id="lm-clip"><use href="#lm-gear" class="lm-spin"/></clipPath><linearGradient id="lm-glow" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="420"><stop offset="0" stop-color="#5B7BF6"/><stop offset="1" stop-color="#2450EC"/></linearGradient></defs><g mask="url(#lm-cut)"><use href="#lm-gear" class="lm-spin" fill="#2450EC"/><polygon points="220,240 295,240 485,430 220,430" fill="url(#lm-glow)" clip-path="url(#lm-clip)"/></g><image href="<?= $R ?>assets/brand/logo-letters.png" x="230" y="243" width="620" height="594"/></svg></span><?php else: ?><span class="logo__mark" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><?php endif; ?>
       <span class="logo__text">Форум<br>работающей<br>молодёжи</span>
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
@@ -102,6 +117,41 @@ function reg_button(string $class, string $label, bool $arrow = true): string
 <main id="main">
 
 <!-- ============ HERO ============ -->
+<?php if ($V2): ?>
+<section class="hero" id="top">
+  <!-- Оригинальный баннер макета. Заголовок на нём — картинка, поэтому дублируем его текстом для поисковиков и экранных дикторов -->
+  <h1 class="visually-hidden">Будущее зависит от тебя — Форум работающей молодёжи</h1>
+  <div class="hero__banner">
+    <img src="<?= $R ?>assets/brand/banner-1920.jpg"
+         srcset="<?= $R ?>assets/brand/banner-1200.jpg 1200w, <?= $R ?>assets/brand/banner-1920.jpg 1920w, <?= $R ?>assets/brand/banner-3587.jpg 3587w"
+         sizes="100vw" width="3587" height="1080"
+         alt="Будущее зависит от тебя. Пётр I на фоне Исаакиевского собора и Зимнего дворца. Твори, созидай, работай" fetchpriority="high">
+  </div>
+  <div class="container hero__bar">
+    <div class="hero__meta">
+      <div><svg class="ico"><use href="#i-cal"/></svg><span><?= e($dateFull) ?></span></div>
+      <div><svg class="ico"><use href="#i-clock"/></svg><span><?= e($timeRange) ?></span></div>
+      <div><svg class="ico"><use href="#i-pin"/></svg><span><?= e($placeShort) ?></span></div>
+    </div>
+<?php if ($after): ?>
+        <div class="thanks">
+          <p class="thanks__title"><?= e($txt['thanks_title']) ?></p>
+          <?php if ($txt['thanks_text'] !== ''): ?><p class="thanks__text"><?= e($txt['thanks_text']) ?></p><?php endif; ?>
+        </div>
+  <?php else: ?>
+        <div class="countdown" id="countdown" aria-label="До начала форума">
+          <p class="countdown__label">До старта</p>
+          <div class="countdown__row">
+            <div><b data-cd="d">00</b><span>дней</span></div>
+            <div><b data-cd="h">00</b><span>часов</span></div>
+            <div><b data-cd="m">00</b><span>минут</span></div>
+          </div>
+        </div>
+  <?php endif; ?>
+    <?= reg_button('btn btn--red btn--lg', 'Зарегистрироваться') ?>
+  </div>
+</section>
+<?php else: ?>
 <section class="hero" id="top">
   <div class="hatch hatch--hero" aria-hidden="true"></div>
   <div class="container hero__grid">
@@ -129,7 +179,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
           <span class="shape shape--dots"></span>
         </div>
         <div class="crop crop--hero" style="--x:360;--y:462;--w:900;--h:382">
-          <img src="assets/slide1.jpg" alt="Созидатели прошлого и настоящего: молодой специалист, М. Ломоносов, Пётр I" width="1500" height="844">
+          <img src="<?= $R ?>assets/slide1.jpg" alt="Созидатели прошлого и настоящего: молодой специалист, М. Ломоносов, Пётр I" width="1500" height="844">
         </div>
       </div>
     </div>
@@ -159,6 +209,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <!-- ============ MARQUEE ============ -->
 <div class="marquee" aria-hidden="true">
@@ -194,7 +245,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
       </div>
       <aside class="about__side reveal">
         <div class="crop crop--about" style="--x:1060;--y:140;--w:440;--h:560">
-          <img src="assets/slide8.jpg" alt="Молодые специалисты поднимаются по ступеням к зданию" loading="lazy" width="1500" height="844">
+          <img src="<?= $R ?>assets/slide8.jpg" alt="Молодые специалисты поднимаются по ступеням к зданию" loading="lazy" width="1500" height="844">
         </div>
         <ul class="facts">
           <li><svg class="ico"><use href="#i-cal"/></svg><div><small>Дата</small><b><?= e($dateFull) ?></b></div></li>
@@ -212,7 +263,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
   <div class="container program__grid">
     <div class="program__art reveal">
       <div class="crop crop--program" style="--x:0;--y:0;--w:580;--h:844">
-        <img src="assets/slide5.jpg" alt="Молодые люди поднимаются по синей лестнице" loading="lazy" width="1500" height="844">
+        <img src="<?= $R ?>assets/slide5.jpg" alt="Молодые люди поднимаются по синей лестнице" loading="lazy" width="1500" height="844">
       </div>
     </div>
     <div class="program__content">
@@ -251,7 +302,7 @@ $tiers    = [
 <?php foreach ($tiers as $tier => $list): if (!$list) continue; ?>
     <ul class="partner-grid partner-grid--<?= $tier ?>">
 <?php foreach ($list as $i => $p): ?>
-      <li class="partner<?= ($tier === 'main' && $i === 0) ? ' partner--wide' : '' ?> reveal" style="--lw:94%;--lh:<?= (int)$p['size'] ?>%"<?= $p['name'] !== '' ? ' tabindex="0"' : '' ?>><img<?= $p['invert'] ? ' class="partner__img--invert"' : '' ?> src="<?= e($p['logo']) ?>" alt="<?= e($p['name']) ?>" loading="lazy"><?php if ($p['name'] !== ''): ?><span class="partner__tip" aria-hidden="true"><?= e($p['name']) ?></span><?php endif; ?></li>
+      <li class="partner<?= ($tier === 'main' && $i === 0) ? ' partner--wide' : '' ?> reveal" style="--lw:94%;--lh:<?= (int)$p['size'] ?>%"<?= $p['name'] !== '' ? ' tabindex="0"' : '' ?>><img<?= $p['invert'] ? ' class="partner__img--invert"' : '' ?> src="<?= e(asset($p['logo'])) ?>" alt="<?= e($p['name']) ?>" loading="lazy"><?php if ($p['name'] !== ''): ?><span class="partner__tip" aria-hidden="true"><?= e($p['name']) ?></span><?php endif; ?></li>
 <?php endforeach; ?>
     </ul>
 <?php endforeach; ?>
@@ -268,7 +319,7 @@ $tiers    = [
     </div>
     <div class="speaker-grid">
 <?php $bios = []; foreach ($content['speakers'] as $s): $hasBio = $s['bio'] !== ''; if ($hasBio) $bios[] = $s; ?>
-      <article class="speaker reveal<?= $hasBio ? ' speaker--bio' : '' ?>"<?= $hasBio ? ' data-bio="' . (count($bios) - 1) . '" tabindex="0" role="button" aria-haspopup="dialog" aria-label="' . e($s['name'] . ' — подробнее') . '"' : '' ?>><div class="speaker__photo"><?php if ($s['photo'] !== ''): ?><img src="<?= e($s['photo']) ?>" alt="<?= e($s['name']) ?>" loading="lazy"<?= $s['crop'] ? ' style="' . e(crop_style($s['crop'])) . '"' : '' ?>><?php else: ?><svg aria-hidden="true"><use href="#i-person"/></svg><?php endif; ?><?php if ($hasBio): ?><span class="speaker__more" aria-hidden="true">Подробнее</span><?php endif; ?></div><h3><?= e($s['name']) ?></h3><p><?= e($s['role']) ?></p></article>
+      <article class="speaker reveal<?= $hasBio ? ' speaker--bio' : '' ?>"<?= $hasBio ? ' data-bio="' . (count($bios) - 1) . '" tabindex="0" role="button" aria-haspopup="dialog" aria-label="' . e($s['name'] . ' — подробнее') . '"' : '' ?>><div class="speaker__photo"><?php if ($s['photo'] !== ''): ?><img src="<?= e(asset($s['photo'])) ?>" alt="<?= e($s['name']) ?>" loading="lazy"<?= $s['crop'] ? ' style="' . e(crop_style($s['crop'])) . '"' : '' ?>><?php else: ?><svg aria-hidden="true"><use href="#i-person"/></svg><?php endif; ?><?php if ($hasBio): ?><span class="speaker__more" aria-hidden="true">Подробнее</span><?php endif; ?></div><h3><?= e($s['name']) ?></h3><p><?= e($s['role']) ?></p></article>
 <?php endforeach; ?>
     </div>
 <?php if ($content['speakers_more']): ?>
@@ -292,7 +343,7 @@ $tiers    = [
     </div>
     <ul class="gallery-grid">
 <?php foreach (array_values(array_filter($content['gallery'], fn($g) => $g['src'] !== '')) as $gi => $g): ?>
-      <li class="gallery__item reveal"><button type="button" class="gallery__open" data-index="<?= $gi ?>" data-src="<?= e($g['src']) ?>" data-caption="<?= e($g['caption']) ?>" aria-label="<?= e($g['caption'] !== '' ? $g['caption'] : 'Открыть фото ' . ($gi + 1)) ?>"><img src="<?= e($g['src']) ?>" alt="<?= e($g['caption']) ?>" loading="lazy"></button></li>
+      <li class="gallery__item reveal"><button type="button" class="gallery__open" data-index="<?= $gi ?>" data-src="<?= e(asset($g['src'])) ?>" data-caption="<?= e($g['caption']) ?>" aria-label="<?= e($g['caption'] !== '' ? $g['caption'] : 'Открыть фото ' . ($gi + 1)) ?>"><img src="<?= e(asset($g['src'])) ?>" alt="<?= e($g['caption']) ?>" loading="lazy"></button></li>
 <?php endforeach; ?>
     </ul>
   </div>
@@ -390,7 +441,7 @@ $tiers    = [
     </div>
   </div>
 </dialog>
-<script type="application/json" id="speakers-data"><?= json_encode(array_map(fn($s) => ['name' => $s['name'], 'role' => $s['role'], 'photo' => $s['photo'], 'pos' => crop_position($s['crop'] ?? null), 'bio' => $s['bio']], $bios), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script type="application/json" id="speakers-data"><?= json_encode(array_map(fn($s) => ['name' => $s['name'], 'role' => $s['role'], 'photo' => asset($s['photo']), 'pos' => crop_position($s['crop'] ?? null), 'bio' => $s['bio']], $bios), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 
 <?php if ($hasGallery): ?>
 <dialog class="lightbox" id="lightbox" aria-label="Просмотр фото">
@@ -401,6 +452,6 @@ $tiers    = [
 </dialog>
 <?php endif; ?>
 
-<script src="js/main.js?v=<?= asset_v('js/main.js') ?>"></script>
+<script src="<?= $R ?>js/main.js?v=<?= asset_v('js/main.js') ?>"></script>
 </body>
 </html>

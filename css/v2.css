@@ -1,0 +1,56 @@
+/* =========================================================
+   Вторая версия дизайна (/v2/): макет «Будущее зависит от тебя»
+   Подключается поверх style.css только на странице /v2/ (body.v2)
+   ========================================================= */
+
+/* ---------- Палитра макета ---------- */
+body.v2 {
+  --blue: #2450EC;      /* логотип, круг */
+  --blue-ink: #0234E9;  /* заголовок баннера */
+  --blue-deep: #1433B8;
+  --blue-soft: #E9EEFE;
+  --red: #D00B12;       /* полосы макета */
+  --red-hot: #FF1624;
+  --red-deep: #A8070D;
+  --ink: #111114;
+  --line: rgba(36, 80, 236, .3);
+}
+
+/* ---------- Логотип «ФРМ»: вращается только шестерёнка ---------- */
+.v2 .logo__mark { width: 48px; height: 46px; flex: none; }
+.v2 .logo__mark svg { animation: none; }
+.logo__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* шестерёнка (и её копия в clipPath для блика) вращается вокруг центра (527, 539) исходника */
+.lm-spin { transform-box: view-box; transform-origin: 527px 539px; animation: lm-spin 16s linear infinite; }
+@keyframes lm-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Первый экран: оригинальный баннер + полоса с датой и регистрацией ---------- */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+body.v2 .hero {
+  display: block; min-height: 0; overflow: visible; background: #fff;
+  padding: calc(var(--header-h) + var(--announce-h)) 0 0;
+}
+.hero__banner { position: relative; overflow: hidden; aspect-ratio: 3587 / 1080; background: #fff; }
+.hero__banner img { display: block; width: 100%; height: 100%; object-fit: cover; animation: fade 1s var(--ease) both; }
+.hero__bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px;
+  padding-block: clamp(20px, calc(2.4vw / var(--z)), 32px) clamp(36px, calc(3.6vw / var(--z)), 52px);
+}
+.v2 .hero__meta { display: flex; flex-wrap: wrap; gap: 10px 32px; font-weight: 700; font-size: 18px; }
+.v2 .hero__meta div { display: flex; align-items: center; gap: 10px; }
+.v2 .hero__meta .ico { width: 24px; height: 24px; color: var(--red); }
+.v2 .countdown { border-left-color: var(--red); }
+.v2 .countdown b { font-size: 40px; }
+
+/* ---------- Красные акценты ---------- */
+.btn--red { --bg: var(--red); --fg: #fff; }
+.btn--red:hover { --bg: var(--red-deep); }
+.v2 .marquee { background: var(--red); }
+.v2 .sec-num { color: var(--red); }
+.v2 .cta-card { background: var(--red); }
+
+@media (max-width: 640px) {
+  .hero__bar { gap: 18px; }
+  .v2 .hero__meta { font-size: 16px; gap: 8px 20px; }
+  .hero__bar .btn { flex: 1 1 100%; }
+}
