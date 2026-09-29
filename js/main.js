@@ -120,7 +120,7 @@
     const s = bios[+el.dataset.bio];
     if (!s) return;
     const photo = $('#speakerModalPhoto');
-    photo.innerHTML = s.photo ? `<img src="${esc(s.photo)}" alt="">` : '<svg aria-hidden="true"><use href="#i-person"/></svg>';
+    photo.innerHTML = s.photo ? `<img src="${esc(s.photo)}" alt=""${s.pos ? ` style="object-position:${esc(s.pos)}"` : ''}>` : '<svg aria-hidden="true"><use href="#i-person"/></svg>';
     $('.modal__body', modal).classList.toggle('no-photo', !s.photo && !el.closest('.speaker-grid'));
     $('#speakerModalName').textContent = s.name;
     $('#speakerModalRole').textContent = s.role;

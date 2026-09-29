@@ -268,7 +268,7 @@ $tiers    = [
     </div>
     <div class="speaker-grid">
 <?php $bios = []; foreach ($content['speakers'] as $s): $hasBio = $s['bio'] !== ''; if ($hasBio) $bios[] = $s; ?>
-      <article class="speaker reveal<?= $hasBio ? ' speaker--bio' : '' ?>"<?= $hasBio ? ' data-bio="' . (count($bios) - 1) . '" tabindex="0" role="button" aria-haspopup="dialog" aria-label="' . e($s['name'] . ' — подробнее') . '"' : '' ?>><div class="speaker__photo"><?php if ($s['photo'] !== ''): ?><img src="<?= e($s['photo']) ?>" alt="<?= e($s['name']) ?>" loading="lazy"><?php else: ?><svg aria-hidden="true"><use href="#i-person"/></svg><?php endif; ?><?php if ($hasBio): ?><span class="speaker__more" aria-hidden="true">Подробнее</span><?php endif; ?></div><h3><?= e($s['name']) ?></h3><p><?= e($s['role']) ?></p></article>
+      <article class="speaker reveal<?= $hasBio ? ' speaker--bio' : '' ?>"<?= $hasBio ? ' data-bio="' . (count($bios) - 1) . '" tabindex="0" role="button" aria-haspopup="dialog" aria-label="' . e($s['name'] . ' — подробнее') . '"' : '' ?>><div class="speaker__photo"><?php if ($s['photo'] !== ''): ?><img src="<?= e($s['photo']) ?>" alt="<?= e($s['name']) ?>" loading="lazy"<?= $s['crop'] ? ' style="' . e(crop_style($s['crop'])) . '"' : '' ?>><?php else: ?><svg aria-hidden="true"><use href="#i-person"/></svg><?php endif; ?><?php if ($hasBio): ?><span class="speaker__more" aria-hidden="true">Подробнее</span><?php endif; ?></div><h3><?= e($s['name']) ?></h3><p><?= e($s['role']) ?></p></article>
 <?php endforeach; ?>
     </div>
 <?php if ($content['speakers_more']): ?>
@@ -390,7 +390,7 @@ $tiers    = [
     </div>
   </div>
 </dialog>
-<script type="application/json" id="speakers-data"><?= json_encode(array_map(fn($s) => ['name' => $s['name'], 'role' => $s['role'], 'photo' => $s['photo'], 'bio' => $s['bio']], $bios), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script type="application/json" id="speakers-data"><?= json_encode(array_map(fn($s) => ['name' => $s['name'], 'role' => $s['role'], 'photo' => $s['photo'], 'pos' => crop_position($s['crop'] ?? null), 'bio' => $s['bio']], $bios), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 
 <?php if ($hasGallery): ?>
 <dialog class="lightbox" id="lightbox" aria-label="Просмотр фото">

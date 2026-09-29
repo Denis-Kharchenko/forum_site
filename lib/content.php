@@ -195,6 +195,7 @@ function normalize_content(array $d): array
             'name'  => str_field($i['name'] ?? '', 120),
             'role'  => str_field($i['role'] ?? '', 200),
             'photo' => image_field($i['photo'] ?? ''),
+            'crop'  => crop_field($i['crop'] ?? null),
             'bio'   => text_field($i['bio'] ?? '', 1500),
         ], 12),
         'speakers_more' => list_field($d['speakers_more'] ?? [], fn($i) => [
@@ -219,6 +220,58 @@ function normalize_content(array $d): array
             'telegram'  => url_field($c['telegram'] ?? ''),
         ],
     ];
+}
+
+/* ---------- Кадрирование фото спикера ----------
+   Кадр хранится без изменения файла: x, y — точка фокуса (доля ширины/высоты фото),
+   z — приближение (1 = фото целиком заполняет рамку), ar — пропорции фото (ширина / высота). */
+
+const CROP_FRAME = 1.25; // рамка карточки 4:5 — высота = 1.25 ширины
+
+function crop_field($v): ?array
+{
+    if (!is_array($v)) return null;
+    $num = fn($k, $min, $max, $def) => is_numeric($v[$k] ?? null) ? max($min, min($max, (float)$v[$k])) : $def;
+    $ar = $num('ar', 0.1, 10, 0);
+    if ($ar <= 0) return null;
+    return ['x' => round($num('x', 0, 1, .5), 4), 'y' => round($num('y', 0, 1, .5), 4), 'z' => round($num('z', 1, 4, 1), 3), 'ar' => round($ar, 4)];
+}
+
+// Размер и положение фото внутри рамки 4:5 в процентах. Та же формула — в admin.js (cropBox)
+function crop_box(array $c): array
+{
+    $z = $c['z'];
+    // ширина и высота фото в долях ширины рамки при заполнении рамки
+    if ($c['ar'] >= 1 / CROP_FRAME) { $dh = CROP_FRAME * $z; $dw = $dh * $c['ar']; }
+    else { $dw = $z; $dh = $dw / $c['ar']; }
+    // фокус не даёт фото отойти от краёв рамки
+    $x = max(.5 / $dw, min(1 - .5 / $dw, $c['x']));
+    $y = max(CROP_FRAME / 2 / $dh, min(1 - CROP_FRAME / 2 / $dh, $c['y']));
+    return [
+        'w' => $dw * 100,
+        'h' => $dh / CROP_FRAME * 100,
+        'l' => (.5 - $x * $dw) * 100,
+        't' => (CROP_FRAME / 2 - $y * $dh) / CROP_FRAME * 100,
+        'x' => $x * 100,
+        'y' => $y * 100,
+    ];
+}
+
+// style для <img> в карточке спикера (пустая строка — кадр не задан, работает обычное заполнение)
+function crop_style(?array $c): string
+{
+    if (!$c) return '';
+    $b = crop_box($c);
+    // inset:auto — первым, иначе он сбросит left/top
+    return sprintf('inset:auto;left:%.3f%%;top:%.3f%%;width:%.3f%%;height:%.3f%%;max-width:none;object-fit:fill', $b['l'], $b['t'], $b['w'], $b['h']);
+}
+
+// object-position для окон другой пропорции (окно «Подробнее»)
+function crop_position(?array $c): string
+{
+    if (!$c) return '';
+    $b = crop_box($c);
+    return sprintf('%.2f%% %.2f%%', $b['x'], $b['y']);
 }
 
 function tel_href(string $phone): string

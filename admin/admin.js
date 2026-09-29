@@ -71,19 +71,109 @@
     return json.path;
   };
 
+  /* ---------- Кадрирование (та же формула, что crop_box в lib/content.php) ---------- */
+  const FRAME = 1.25; // рамка карточки 4:5
+  const cropBox = c => {
+    let dw, dh;
+    if (c.ar >= 1 / FRAME) { dh = FRAME * c.z; dw = dh * c.ar; } else { dw = c.z; dh = dw / c.ar; }
+    const x = Math.max(.5 / dw, Math.min(1 - .5 / dw, c.x));
+    const y = Math.max(FRAME / 2 / dh, Math.min(1 - FRAME / 2 / dh, c.y));
+    return { dw, dh, x, y, w: dw * 100, h: dh / FRAME * 100, l: (.5 - x * dw) * 100, t: (FRAME / 2 - y * dh) / FRAME * 100 };
+  };
+  const cropStyle = c => {
+    if (!c) return null;
+    const b = cropBox(c);
+    return `position:absolute;inset:auto;left:${b.l}%;top:${b.t}%;width:${b.w}%;height:${b.h}%;max-width:none;object-fit:fill`;
+  };
+
+  const cropDialog = document.createElement('dialog');
+  cropDialog.className = 'crop-dialog';
+  document.body.append(cropDialog);
+
+  const openCrop = (obj, src) => {
+    const img = new Image();
+    img.onload = () => {
+      const ar = img.naturalWidth / img.naturalHeight;
+      const c = obj.crop && Math.abs(obj.crop.ar - ar) < .01 ? { ...obj.crop } : { x: .5, y: .5, z: 1, ar };
+      const frame = h('div', { class: 'crop-frame' });
+      const pic = h('img', { src, alt: '', draggable: 'false' });
+      frame.append(pic, h('div', { class: 'crop-frame__grid', 'aria-hidden': 'true' }));
+      const zoomLabel = h('span', {}, '');
+      const zoom = h('input', { type: 'range', min: 1, max: 3, step: .01, value: c.z, 'aria-label': 'Приближение' });
+      const apply = () => {
+        const b = cropBox(c);
+        c.x = b.x; c.y = b.y; // фокус не выходит за края
+        pic.style.cssText = cropStyle(c);
+        zoom.value = c.z;
+        zoomLabel.textContent = 'Приближение: ' + Math.round(c.z * 100) + '%';
+      };
+      zoom.addEventListener('input', () => { c.z = +zoom.value; apply(); });
+
+      // перетаскивание мышью и пальцем
+      let drag = null;
+      frame.addEventListener('pointerdown', e => {
+        frame.setPointerCapture(e.pointerId);
+        drag = { px: e.clientX, py: e.clientY, x: c.x, y: c.y };
+        frame.classList.add('is-dragging');
+      });
+      frame.addEventListener('pointermove', e => {
+        if (!drag) return;
+        const b = cropBox(c), W = frame.clientWidth;
+        c.x = drag.x - (e.clientX - drag.px) / (b.dw * W);
+        c.y = drag.y - (e.clientY - drag.py) / (b.dh * W);
+        apply();
+      });
+      const stop = () => { drag = null; frame.classList.remove('is-dragging'); };
+      frame.addEventListener('pointerup', stop);
+      frame.addEventListener('pointercancel', stop);
+      frame.addEventListener('wheel', e => { e.preventDefault(); c.z = Math.max(1, Math.min(3, c.z - e.deltaY * .0015)); apply(); }, { passive: false });
+      // клавиатура: стрелки двигают, +/- приближают
+      frame.tabIndex = 0;
+      frame.addEventListener('keydown', e => {
+        const step = .02, k = e.key;
+        if (k === 'ArrowLeft') c.x -= step; else if (k === 'ArrowRight') c.x += step;
+        else if (k === 'ArrowUp') c.y -= step; else if (k === 'ArrowDown') c.y += step;
+        else if (k === '+' || k === '=') c.z = Math.min(3, c.z + .1); else if (k === '-') c.z = Math.max(1, c.z - .1);
+        else return;
+        e.preventDefault(); apply();
+      });
+
+      cropDialog.replaceChildren(
+        h('h2', {}, 'Кадрирование фото'),
+        h('p', { class: 'muted' }, 'Перетащите фото, чтобы выбрать кадр. Приближение — ползунком или колёсиком мыши. Так карточка будет выглядеть на сайте.'),
+        frame,
+        h('label', { class: 'field field--range' }, zoomLabel, zoom),
+        h('div', { class: 'crop-dialog__actions' },
+          h('button', { type: 'button', class: 'link', onclick: () => { c.x = .5; c.y = .5; c.z = 1; apply(); } }, 'Сбросить'),
+          h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => cropDialog.close() }, 'Отмена'),
+          h('button', { type: 'button', class: 'btn', onclick: () => {
+            obj.crop = { x: +c.x.toFixed(4), y: +c.y.toFixed(4), z: +c.z.toFixed(3), ar: +c.ar.toFixed(4) };
+            cropDialog.close(); markDirty(); render();
+          } }, 'Готово')));
+      apply();
+      cropDialog.showModal();
+      frame.focus();
+    };
+    img.onerror = () => setStatus('Не удалось открыть фото для кадрирования', 'error');
+    img.src = src;
+  };
+
   const imagePicker = (obj, key, kind, label) => {
     const src = obj[key] ? '../' + obj[key] : '';
+    const canCrop = kind === 'speaker' && src;
+    const style = obj.invert ? 'filter: invert(1) brightness(1.2); mix-blend-mode: multiply' : (canCrop ? cropStyle(obj.crop) : null);
     return h('div', { class: 'picker picker--' + kind },
-      h('div', { class: 'picker__preview' }, src ? h('img', { src, alt: '', style: obj.invert ? 'filter: invert(1) brightness(1.2); mix-blend-mode: multiply' : null }) : h('span', {}, 'Нет картинки')),
+      h('div', { class: 'picker__preview' }, src ? h('img', { src, alt: '', style }) : h('span', {}, 'Нет картинки')),
       h('div', { class: 'picker__actions' },
         h('label', { class: 'btn btn--small' }, label,
-          h('input', { type: 'file', accept: '.jpg,.jpeg,.png,.webp,.svg', hidden: true,
+          h('input', { type: 'file', accept: kind === 'speaker' ? '.jpg,.jpeg,.png,.webp' : '.jpg,.jpeg,.png,.webp,.svg', hidden: true,
             onchange: async e => {
               const f = e.target.files[0]; if (!f) return;
               const path = await upload(f, kind);
-              if (path) { obj[key] = path; dirty = true; render(); }
+              if (path) { obj[key] = path; if (kind === 'speaker') obj.crop = null; dirty = true; render(); }
             } })),
-        obj[key] ? h('button', { type: 'button', class: 'link', onclick: () => { obj[key] = ''; markDirty(); render(); } }, 'Убрать') : ''));
+        canCrop ? h('button', { type: 'button', class: 'btn btn--small btn--ghost', onclick: () => openCrop(obj, src) }, 'Кадрировать') : '',
+        obj[key] ? h('button', { type: 'button', class: 'link', onclick: () => { obj[key] = ''; if (kind === 'speaker') obj.crop = null; markDirty(); render(); } }, 'Убрать') : ''));
   };
 
   const uploadMany = async (files, kind, onEach) => {
