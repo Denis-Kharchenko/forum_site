@@ -21,8 +21,11 @@ function reg_button(string $class, string $label, bool $arrow = true): string
     if ($after) {
         return $hasGallery ? '<a href="#gallery" class="' . e($class) . '">Фото с форума' . $ico . '</a>' : '';
     }
-    $href = $set['reg_url'] !== '' ? e($set['reg_url']) . '" target="_blank" rel="noopener' : '#';
-    return '<a href="' . $href . '" class="' . e($class) . ' js-reg">' . e($label) . $ico . '</a>';
+    if ($set['reg_url'] !== '') {
+        return '<a href="' . e($set['reg_url']) . '" target="_blank" rel="noopener" class="' . e($class) . '">' . e($label) . $ico . '</a>';
+    }
+    // Ссылки ещё нет: js-reg показывает подсказку «откроется совсем скоро»
+    return '<a href="#" class="' . e($class) . ' js-reg">' . e($label) . $ico . '</a>';
 }
 ?>
 <!doctype html>
