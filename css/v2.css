@@ -49,6 +49,64 @@ body.v2 .hero {
 .v2 .sec-num { color: var(--red); }
 .v2 .cta-card { background: var(--red); }
 
+/* ---------- Баланс красного и синего ----------
+   Синий — заголовки, время программы, факты, логотип и кнопка в шапке.
+   Красный — кнопки в разделах, линии, подписи, декор и акценты при наведении. */
+
+/* Шапка: подчёркивание активного пункта меню — красное */
+.v2 .nav a::after { background: var(--red); }
+
+/* Кнопки регистрации в разделах — красные (в шапке остаётся синяя) */
+.v2 main .btn--blue { --bg: var(--red); }
+.v2 main .btn--blue:hover { --bg: var(--red-deep); }
+
+/* Декоративные линии и точки */
+.v2 .rule { background: var(--red); }
+.v2 .dots { background-image: radial-gradient(circle, var(--red) 3px, transparent 3.5px); }
+.v2 .sec-head__text { border-left-color: var(--red); }
+
+/* О форуме: плашка фактов с красной диагональной полосой, как на баннере */
+.v2 .facts { overflow: hidden; }
+.v2 .facts::before {
+  content: ""; position: absolute; right: -78px; top: -20px; width: 150px; height: 160%;
+  background: linear-gradient(90deg, var(--red) 0 18px, transparent 18px 30px, var(--red-hot) 30px 38px, transparent 38px);
+  transform: rotate(30deg); pointer-events: none; opacity: .95;
+}
+.v2 .facts li { position: relative; }
+.v2 .facts .ico { color: #fff; }
+
+/* Программа: красная линия сверху, мягкий красный при наведении, время остаётся синим */
+.v2 .timeline { border-top-color: var(--red); }
+.v2 .timeline li:hover { background: #FDECEC; }
+.v2 .timeline li:hover time { color: var(--red); }
+
+/* Партнёры: красная тень при наведении */
+.v2 .partner:hover { border-color: var(--red); box-shadow: 6px 6px 0 var(--red); }
+
+/* Спикеры: заглушки чередуют синий, красный и чёрный; линии списка — красные */
+.v2 .speaker:nth-child(3n+2) .speaker__photo { background: var(--red); }
+.v2 .speaker:nth-child(3n) .speaker__photo { background: var(--ink); }
+.v2 .speaker:nth-child(4n+3) .speaker__photo { background: var(--blue); }
+.v2 .speaker-list li { border-top-color: var(--red); }
+.v2 .speaker-list li.speaker--bio:hover { background: #FDECEC; }
+
+/* Место: красные подписи и красная рамка-тень у карты */
+.v2 .place__list dt { color: var(--red); }
+.v2 .place__map::before { border-color: var(--red); }
+
+/* Контакты: красные иконки и подписи, соцсети при наведении — красные */
+.v2 .contact-list .ico, .v2 .contact-list small { color: var(--red); }
+.v2 .social:hover { background: var(--red); border-color: var(--red); }
+
+/* Подвал: красные диагональные полосы у края, надпись синяя */
+.v2 .footer { position: relative; overflow: hidden; border-top: 6px solid var(--red); }
+.v2 .footer::before {
+  content: ""; position: absolute; right: -170px; top: -40px; width: 320px; height: 200%;
+  background: linear-gradient(90deg, var(--red) 0 34px, transparent 34px 52px, var(--red-hot) 52px 62px, transparent 62px 80px, #fff 80px 84px, transparent 84px);
+  transform: rotate(30deg); opacity: .9; pointer-events: none;
+}
+.v2 .footer__inner { position: relative; }
+
 @media (max-width: 640px) {
   .hero__bar { gap: 18px; }
   .v2 .hero__meta { font-size: 16px; gap: 8px 20px; }
