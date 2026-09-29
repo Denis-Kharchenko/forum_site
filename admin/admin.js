@@ -248,9 +248,20 @@
       const res = await fetch('./', { method: 'POST', body: fd, credentials: 'same-origin' });
       const json = await res.json().catch(() => ({ ok: false, error: 'Ошибка сервера' }));
       if (!json.ok) { setStatus(json.error || 'Не удалось сохранить', 'error'); return; }
+      // Поля, которые сервер не принял (например, неверная ссылка или email), не должны пропадать молча
+      const rejected = [
+        [data.settings.reg_url, json.content.settings.reg_url, 'ссылка на регистрацию'],
+        [data.announcement.link_url, json.content.announcement.link_url, 'ссылка кнопки объявления'],
+        [data.contacts.vk, json.content.contacts.vk, 'ссылка на VK'],
+        [data.contacts.telegram, json.content.contacts.telegram, 'ссылка на Telegram'],
+        [data.contacts.email, json.content.contacts.email, 'email'],
+        [data.contacts.press, json.content.contacts.press, 'email для СМИ']
+      ].filter(([sent, saved]) => String(sent || '').trim() !== '' && !saved).map(([, , name]) => name);
       Object.assign(data, json.content); // сервер вернул очищенные данные
       dirty = false;
-      setStatus('Сохранено ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }), 'ok');
+      const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      if (rejected.length) setStatus(`Сохранено ${time}, но не принято: ${rejected.join(', ')} — проверьте, что написано без ошибок`, 'error');
+      else setStatus('Сохранено ' + time, 'ok');
       render();
     } catch {
       setStatus('Нет связи с сервером', 'error');

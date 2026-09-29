@@ -76,8 +76,14 @@ function str_field($v, int $max = 200): string
 
 function url_field($v): string
 {
-    $s = str_field($v, 500);
-    return preg_match('~^https?://~i', $s) ? $s : '';
+    $s = preg_replace('/\s+/u', '', str_field($v, 500)) ?? '';
+    if ($s === '') return '';
+    // «myrosmol.ru/…» или «//myrosmol.ru/…» — дописываем https://
+    if (!preg_match('~^[a-z][a-z0-9+.-]*:~i', $s)) {
+        $s = 'https://' . ltrim($s, '/');
+    }
+    // домен с точкой; кириллические домены (.рф) тоже подходят
+    return preg_match('~^https?://[^\s/?#<>"\'`]+\.[^\s/?#<>"\'`]+([/?#][^\s<>"\'`]*)?$~iu', $s) ? $s : '';
 }
 
 function image_field($v): string
