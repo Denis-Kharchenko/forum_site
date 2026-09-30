@@ -5,8 +5,8 @@
   <circle class="b2-circle" cx="2034.7" cy="730.9" r="592.1" fill="#2450EC"/>
   <g class="b2-bridge-wrap" clip-path="url(#b2-bc)"><image class="b2-bridge" href="<?= $R ?>assets/brand/b2/bridge.webp" x="690" y="430" width="1120" height="797" preserveAspectRatio="none"/></g>
   <g class="b2-left"><polygon class="st st-l1" points="-50,-28.4 760,1158.3 746.6,1167.4 -63.4,-19.2" fill="#D00B12"/><polygon class="st st-l2" points="-50,48.3 700,1147 671.4,1166.5 -78.6,67.8" fill="#D00B12"/><polygon class="st st-l3" points="513.9,570 800,989.2 800,1156.9 399.4,570" fill="#F41422"/></g>
-  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="1738" y="40" width="859" height="960" preserveAspectRatio="none"/>
   <image class="b2-right_ink" href="<?= $R ?>assets/brand/b2/right_ink.webp" x="1487" y="-60" width="2100" height="1140" preserveAspectRatio="none"/>
+  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="1950" y="90" width="814" height="910" preserveAspectRatio="none"/>
   <image class="b2-peter" href="<?= $R ?>assets/brand/b2/peter.webp" x="1383" y="159" width="765" height="921" preserveAspectRatio="none" mask="url(#b2-pm)"/>
   <image class="b2-right_top" href="<?= $R ?>assets/brand/b2/right_top.webp" x="1487" y="-60" width="2100" height="1140" preserveAspectRatio="none"/>
   <image class="b2-headline" href="<?= $R ?>assets/brand/b2/headline.webp" x="140" y="232" width="1300" height="390" preserveAspectRatio="none"/>
