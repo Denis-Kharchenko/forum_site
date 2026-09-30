@@ -6,7 +6,7 @@
   <g class="b2-bridge-wrap" clip-path="url(#b2-bc)"><image class="b2-bridge" href="<?= $R ?>assets/brand/b2/bridge.webp" x="690" y="430" width="1120" height="797" preserveAspectRatio="none"/></g>
   <g class="b2-left"><polygon class="st st-l1" points="-50,-28.4 760,1158.3 746.6,1167.4 -63.4,-19.2" fill="#D00B12"/><polygon class="st st-l2" points="-50,48.3 700,1147 671.4,1166.5 -78.6,67.8" fill="#D00B12"/><polygon class="st st-l3" points="513.9,570 800,989.2 800,1156.9 399.4,570" fill="#F41422"/></g>
   <image class="b2-right_ink" href="<?= $R ?>assets/brand/b2/right_ink.webp" x="1487" y="-60" width="2100" height="1140" preserveAspectRatio="none"/>
-  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="1950" y="90" width="814" height="910" preserveAspectRatio="none"/>
+  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="1687" y="8" width="960" height="1072" preserveAspectRatio="none"/>
   <image class="b2-peter" href="<?= $R ?>assets/brand/b2/peter.webp" x="1383" y="159" width="765" height="921" preserveAspectRatio="none" mask="url(#b2-pm)"/>
   <image class="b2-right_top" href="<?= $R ?>assets/brand/b2/right_top.webp" x="1487" y="-60" width="2100" height="1140" preserveAspectRatio="none"/>
   <image class="b2-headline" href="<?= $R ?>assets/brand/b2/headline.webp" x="140" y="232" width="1300" height="390" preserveAspectRatio="none"/>
@@ -14,8 +14,8 @@
 </svg>
 <svg class="b2 b2--m" viewBox="0 0 1080 1350" role="img" aria-label="Будущее зависит от тебя. Пётр I на фоне Лахта-центра">
   <rect width="1080" height="1350" fill="#fff"/>
+  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="-120" y="568" width="700" height="782" preserveAspectRatio="none"/>
   <circle class="b2-circle" cx="650" cy="900" r="380" fill="#2450EC"/>
-  <image class="b2-lakhta" href="<?= $R ?>assets/brand/b2/lakhta.webp" x="-70" y="470" width="560" height="626" preserveAspectRatio="none"/>
   <image class="b2-peter" href="<?= $R ?>assets/brand/b2/peter.webp" x="250" y="450" width="748" height="900" preserveAspectRatio="none"/>
   <g class="b2-mstripes"><polygon class="st" points="560,896.7 1100,584.9 1100,596.9 560,908.7" fill="#111"/><polygon class="st" points="180,1176.1 1100,644.9 1100,668.9 180,1200.1" fill="#D00B12"/><polygon class="st" points="-20,1343.5 1100,696.9 1100,736.9 -20,1383.5" fill="#FF1624"/><polygon class="st" points="-20,1409.5 700,993.8 700,1005.8 -20,1421.5" fill="#111"/><polygon class="st" points="-20,1451.5 1100,804.9 1100,1464.9 -20,2111.5" fill="#D00B12"/></g>
   <image class="b2-headline" href="<?= $R ?>assets/brand/b2/headline.webp" x="60" y="170" width="960" height="288" preserveAspectRatio="none"/>
