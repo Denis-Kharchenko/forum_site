@@ -1,6 +1,6 @@
 /* =========================================================
-   Вторая версия дизайна (/v2/): макет «Будущее зависит от тебя»
-   Подключается поверх style.css только на странице /v2/ (body.v2)
+   Дизайн по макету «Будущее зависит от тебя»
+   Подключается поверх style.css (body.v2)
    ========================================================= */
 
 /* ---------- Палитра макета ---------- */
@@ -31,7 +31,29 @@ body.v2 .hero {
   padding: calc(var(--header-h) + var(--announce-h)) 0 0;
 }
 .hero__banner { position: relative; overflow: hidden; aspect-ratio: 3587 / 1080; background: #fff; }
-.hero__banner img { display: block; width: 100%; height: 100%; object-fit: cover; animation: fade 1s var(--ease) both; }
+.b2 { display: block; width: 100%; height: 100%; }
+
+/* Появление баннера: элементы собираются по очереди.
+   Сдвиги — в единицах полотна 3587×1080, поэтому одинаково выглядят на любом экране */
+.b2 > *, .b2 g > * { transform-box: fill-box; }
+.b2-circle { transform-origin: center; animation: b2-pop 1s var(--ease) both; }
+.b2-left .st { animation: b2-from-top-left .9s .1s var(--ease) both; }
+.b2-left .st:nth-child(2) { animation-delay: .18s; }
+.b2-left .st:nth-child(3) { animation-delay: .26s; }
+.b2-headline { animation: b2-from-left .8s .15s var(--ease) both; }
+.b2-bridge { animation: b2-rise 1s .3s var(--ease) both; }
+.b2-lakhta { animation: b2-rise 1.1s .35s var(--ease) both; }
+.b2-right_ink { animation: b2-fade 1s .45s var(--ease) both; }
+.b2-peter { animation: b2-rise 1s .25s var(--ease) both; }
+.b2-right_top { animation: b2-from-right .9s .6s var(--ease) both; }
+.b2-logos > * { animation: b2-fade .6s calc(.8s + var(--i, 0) * .08s) both; }
+@keyframes b2-pop { from { transform: scale(.55); opacity: 0; } }
+@keyframes b2-rise { from { transform: translateY(90px); opacity: 0; } }
+@keyframes b2-fade { from { opacity: 0; } }
+@keyframes b2-from-left { from { transform: translateX(-120px); opacity: 0; } }
+/* полосы едут вдоль своего наклона */
+@keyframes b2-from-top-left { from { transform: translate(-110px, -160px); opacity: 0; } }
+@keyframes b2-from-right { from { transform: translate(190px, -110px); opacity: 0; } }
 .hero__bar {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px;
   padding-block: clamp(20px, calc(2.4vw / var(--z)), 32px) clamp(36px, calc(3.6vw / var(--z)), 52px);

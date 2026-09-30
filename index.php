@@ -2,10 +2,8 @@
 require __DIR__ . '/lib/content.php';
 $content = load_content();
 
-// Вторая версия дизайна открывается по адресу /v2/ (v2/index.php подключает эту же страницу).
-// Страница там лежит на уровень глубже, поэтому относительные пути к файлам получают префикс «../».
-$V2 = defined('SITE_V2');
-$R  = $V2 ? '../' : '';
+// Префикс относительных путей к файлам (пустой: страница лежит в корне сайта)
+$R = '';
 function asset(string $p): string
 {
     global $R;
@@ -52,13 +50,9 @@ function reg_button(string $class, string $label, bool $arrow = true): string
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= $R ?>css/style.css?v=<?= asset_v('css/style.css') ?>">
-<?php if ($V2): ?>
-  <link rel="stylesheet" href="../css/v2.css?v=<?= asset_v('css/v2.css') ?>">
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="canonical" href="https://forum-rm2026.ru/">
-<?php endif; ?>
+  <link rel="stylesheet" href="css/v2.css?v=<?= asset_v('css/v2.css') ?>">
 </head>
-<body<?= $V2 ? ' class="v2"' : '' ?> data-forum-start="<?= e($set['date'] . 'T' . $set['time_start'] . ':00+03:00') ?>" data-reg-url="<?= e($set['reg_url']) ?>">
+<body class="v2" data-forum-start="<?= e($set['date'] . 'T' . $set['time_start'] . ':00+03:00') ?>" data-reg-url="<?= e($set['reg_url']) ?>">
 
 <!-- SVG-символы -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -94,8 +88,8 @@ function reg_button(string $class, string $label, bool $arrow = true): string
 <header class="header" id="header">
   <div class="container header__inner">
     <a href="#top" class="logo" aria-label="На главную">
-      <?php if ($V2): ?><span class="logo__mark" aria-hidden="true"><!-- шестерёнка вращается, вырез под буквы и блик неподвижны --><svg class="logo__svg" viewBox="230 243 620 594" aria-hidden="true" focusable="false"><defs><path id="lm-gear" d="M759.5 539A232.5 232.5 0 1 1 294.5 539A232.5 232.5 0 1 1 759.5 539ZM701 539A174 174 0 1 0 353 539A174 174 0 1 0 701 539ZM471.7 314L482 249.5L572 249.5L582.3 314ZM350.01 389.48L320.43 331.24L393.24 278.34L439.49 324.47ZM295.92 522.06L237.76 492.34L265.57 406.74L330.1 416.88ZM330.1 661.12L265.57 671.26L237.76 585.66L295.92 555.94ZM439.49 753.53L393.24 799.66L320.43 746.76L350.01 688.52ZM582.3 764L572 828.5L482 828.5L471.7 764ZM703.99 688.52L733.57 746.76L660.76 799.66L614.51 753.53ZM758.08 555.94L816.24 585.66L788.43 671.26L723.9 661.12ZM723.9 416.88L788.43 406.74L816.24 492.34L758.08 522.06ZM614.51 324.47L660.76 278.34L733.57 331.24L703.99 389.48Z"/><mask id="lm-cut" maskUnits="userSpaceOnUse" x="230" y="243" width="620" height="594"><rect x="230" y="243" width="620" height="594" fill="#fff"/><rect x="581.5" y="414.5" width="270" height="425" fill="#000"/></mask><clipPath id="lm-clip"><use href="#lm-gear" class="lm-spin"/></clipPath><linearGradient id="lm-glow" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="420"><stop offset="0" stop-color="#5B7BF6"/><stop offset="1" stop-color="#2450EC"/></linearGradient></defs><g mask="url(#lm-cut)"><use href="#lm-gear" class="lm-spin" fill="#2450EC"/><polygon points="220,240 295,240 485,430 220,430" fill="url(#lm-glow)" clip-path="url(#lm-clip)"/></g><image href="<?= $R ?>assets/brand/logo-letters.png" x="230" y="243" width="620" height="594"/></svg></span><?php else: ?><span class="logo__mark" aria-hidden="true"><svg><use href="#i-gear"/></svg></span><?php endif; ?>
-      <span class="logo__text">Форум<br>работающей<br>молодёжи</span>
+      <span class="logo__mark" aria-hidden="true"><!-- шестерёнка вращается, вырез под буквы и блик неподвижны --><svg class="logo__svg" viewBox="230 243 620 594" aria-hidden="true" focusable="false"><defs><path id="lm-gear" d="M759.5 539A232.5 232.5 0 1 1 294.5 539A232.5 232.5 0 1 1 759.5 539ZM701 539A174 174 0 1 0 353 539A174 174 0 1 0 701 539ZM471.7 314L482 249.5L572 249.5L582.3 314ZM350.01 389.48L320.43 331.24L393.24 278.34L439.49 324.47ZM295.92 522.06L237.76 492.34L265.57 406.74L330.1 416.88ZM330.1 661.12L265.57 671.26L237.76 585.66L295.92 555.94ZM439.49 753.53L393.24 799.66L320.43 746.76L350.01 688.52ZM582.3 764L572 828.5L482 828.5L471.7 764ZM703.99 688.52L733.57 746.76L660.76 799.66L614.51 753.53ZM758.08 555.94L816.24 585.66L788.43 671.26L723.9 661.12ZM723.9 416.88L788.43 406.74L816.24 492.34L758.08 522.06ZM614.51 324.47L660.76 278.34L733.57 331.24L703.99 389.48Z"/><mask id="lm-cut" maskUnits="userSpaceOnUse" x="230" y="243" width="620" height="594"><rect x="230" y="243" width="620" height="594" fill="#fff"/><rect x="581.5" y="414.5" width="270" height="425" fill="#000"/></mask><clipPath id="lm-clip"><use href="#lm-gear" class="lm-spin"/></clipPath><linearGradient id="lm-glow" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="420"><stop offset="0" stop-color="#5B7BF6"/><stop offset="1" stop-color="#2450EC"/></linearGradient></defs><g mask="url(#lm-cut)"><use href="#lm-gear" class="lm-spin" fill="#2450EC"/><polygon points="220,240 295,240 485,430 220,430" fill="url(#lm-glow)" clip-path="url(#lm-clip)"/></g><image href="<?= $R ?>assets/brand/logo-letters.png" x="230" y="243" width="620" height="594"/></svg></span>
+      <span class="logo__text">Форум<br>работающей молодёжи<br>Санкт-Петербурга</span>
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
       <a href="#about">О форуме</a>
@@ -117,16 +111,10 @@ function reg_button(string $class, string $label, bool $arrow = true): string
 <main id="main">
 
 <!-- ============ HERO ============ -->
-<?php if ($V2): ?>
 <section class="hero" id="top">
   <!-- Оригинальный баннер макета. Заголовок на нём — картинка, поэтому дублируем его текстом для поисковиков и экранных дикторов -->
   <h1 class="visually-hidden">Будущее зависит от тебя — Форум работающей молодёжи</h1>
-  <div class="hero__banner">
-    <img src="<?= $R ?>assets/brand/banner-1920.jpg"
-         srcset="<?= $R ?>assets/brand/banner-1200.jpg 1200w, <?= $R ?>assets/brand/banner-1920.jpg 1920w, <?= $R ?>assets/brand/banner-3587.jpg 3587w"
-         sizes="100vw" width="3587" height="1080"
-         alt="Будущее зависит от тебя. Пётр I на фоне Исаакиевского собора и Зимнего дворца. Твори, созидай, работай" fetchpriority="high">
-  </div>
+  <div class="hero__banner"><?php include __DIR__ . '/lib/banner-v2.php'; ?></div>
   <div class="container hero__bar">
     <div class="hero__meta">
       <div><svg class="ico"><use href="#i-cal"/></svg><span><?= e($dateFull) ?></span></div>
@@ -151,65 +139,6 @@ function reg_button(string $class, string $label, bool $arrow = true): string
     <?= reg_button('btn btn--red btn--lg', 'Зарегистрироваться') ?>
   </div>
 </section>
-<?php else: ?>
-<section class="hero" id="top">
-  <div class="hatch hatch--hero" aria-hidden="true"></div>
-  <div class="container hero__grid">
-    <div class="hero__left">
-      <span class="corner corner--tl" aria-hidden="true"></span>
-      <p class="hero__eyebrow">Форум<br>работающей<br>молодёжи</p>
-      <p class="hero__manifest">Твой голос.<br>Твои идеи.<br>Твоё время.<br>Твоё будущее.</p>
-      <div class="hero__meta">
-        <div><svg class="ico"><use href="#i-cal"/></svg><span><?= e($dateFull) ?></span></div>
-        <div><svg class="ico"><use href="#i-clock"/></svg><span><?= e($timeRange) ?></span></div>
-        <div><svg class="ico"><use href="#i-pin"/></svg><span><?= e($placeShort) ?></span></div>
-      </div>
-    </div>
-
-    <div class="hero__center">
-      <h1 class="hero__title">
-        <span class="line"><span>Наследие</span></span>
-        <span class="line"><span>созидателей</span></span>
-      </h1>
-      <div class="hero__art">
-        <div class="hero__shapes" aria-hidden="true">
-          <span class="shape shape--circle"></span>
-          <span class="shape shape--bar1"></span>
-          <span class="shape shape--bar2"></span>
-          <span class="shape shape--dots"></span>
-        </div>
-        <div class="crop crop--hero" style="--x:360;--y:462;--w:900;--h:382">
-          <img src="<?= $R ?>assets/slide1.jpg" alt="Созидатели прошлого и настоящего: молодой специалист, М. Ломоносов, Пётр I" width="1500" height="844">
-        </div>
-      </div>
-    </div>
-
-    <div class="hero__right">
-      <svg class="hero__arrow"><use href="#i-arrow"/></svg>
-      <ul class="hero__words">
-        <li>Труд</li><li>Творчество</li><li>Движение</li><li>Вперёд</li>
-      </ul>
-<?php if ($after): ?>
-      <div class="thanks">
-        <p class="thanks__title"><?= e($txt['thanks_title']) ?></p>
-        <?php if ($txt['thanks_text'] !== ''): ?><p class="thanks__text"><?= e($txt['thanks_text']) ?></p><?php endif; ?>
-      </div>
-<?php else: ?>
-      <div class="countdown" id="countdown" aria-label="До начала форума">
-        <p class="countdown__label">До старта</p>
-        <div class="countdown__row">
-          <div><b data-cd="d">00</b><span>дней</span></div>
-          <div><b data-cd="h">00</b><span>часов</span></div>
-          <div><b data-cd="m">00</b><span>минут</span></div>
-        </div>
-      </div>
-<?php endif; ?>
-      <?= reg_button('btn btn--blue btn--lg', 'Зарегистрироваться') ?>
-      <p class="hero__motto">Вдохновляемся прошлым —<br>создаём будущее</p>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
 
 <!-- ============ MARQUEE ============ -->
 <div class="marquee" aria-hidden="true">
