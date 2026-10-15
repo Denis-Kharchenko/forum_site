@@ -91,6 +91,27 @@
     reveals.forEach(el => io.observe(el));
   }
 
+  /* ---------- Карта 2ГИС (грузим, когда блок подъезжает к экрану) ---------- */
+  const mapEl = $('#placeMap');
+  if (mapEl) {
+    const initMap = () => {
+      const s = document.createElement('script');
+      s.src = 'https://maps.api.2gis.ru/2.0/loader.js?pkg=full';
+      s.onload = () => window.DG.then(() => {
+        const pos = [+mapEl.dataset.lat, +mapEl.dataset.lon];
+        const map = window.DG.map(mapEl, { center: pos, zoom: 17, scrollWheelZoom: false, fullscreenControl: false });
+        window.DG.marker(pos).addTo(map).bindPopup(mapEl.dataset.title);
+      });
+      document.head.appendChild(s);
+    };
+    if ('IntersectionObserver' in window) {
+      const mio = new IntersectionObserver(entries => {
+        if (entries.some(e => e.isIntersecting)) { mio.disconnect(); initMap(); }
+      }, { rootMargin: '400px 0px' });
+      mio.observe(mapEl);
+    } else initMap();
+  }
+
   /* ---------- Обратный отсчёт ---------- */
   const cd = { d: $('[data-cd="d"]'), h: $('[data-cd="h"]'), m: $('[data-cd="m"]') };
   if (cd.d) {
