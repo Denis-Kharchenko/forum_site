@@ -298,10 +298,7 @@ $tiers    = [
       </dl>
     </div>
     <div class="place__map reveal">
-      <?php /* Карта временно отключена — вместо неё кнопки ниже. Скрипт в js/main.js сам ничего не делает, пока нет #placeMap.
-      <div class="place__canvas" id="placeMap" role="region" aria-label="Карта: <?= e($set['address']) ?>" data-lat="59.938782" data-lon="30.351440" data-title="<?= e($set['venue']) ?>"></div>
-      */ ?>
-      <div class="place__canvas place__go">
+      <div class="place__go">
         <p class="place__go-title">Как добраться</p>
         <p class="place__go-addr"><?= e($set['address']) ?></p>
         <div class="place__links">

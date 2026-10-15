@@ -91,43 +91,6 @@
     reveals.forEach(el => io.observe(el));
   }
 
-  /* ---------- Карта: Leaflet + подложка OpenStreetMap, ключ не нужен (грузим, когда блок подъезжает к экрану) ---------- */
-  const mapEl = $('#placeMap');
-  if (mapEl) {
-    const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min';
-    const initMap = () => {
-      const css = document.createElement('link');
-      css.rel = 'stylesheet';
-      css.href = LEAFLET + '.css';
-      css.integrity = 'sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==';
-      css.crossOrigin = 'anonymous';
-      document.head.appendChild(css);
-      const s = document.createElement('script');
-      s.src = LEAFLET + '.js';
-      s.integrity = 'sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==';
-      s.crossOrigin = 'anonymous';
-      s.onload = () => {
-        const L = window.L;
-        const pos = [+mapEl.dataset.lat, +mapEl.dataset.lon];
-        const map = L.map(mapEl, { center: pos, zoom: 17, scrollWheelZoom: false });
-        map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-        const icon = L.divIcon({ className: 'place__pin', html: '<span></span>', iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -28] });
-        L.marker(pos, { icon, title: mapEl.dataset.title }).addTo(map).bindPopup(mapEl.dataset.title);
-      };
-      document.head.appendChild(s);
-    };
-    if ('IntersectionObserver' in window) {
-      const mio = new IntersectionObserver(entries => {
-        if (entries.some(e => e.isIntersecting)) { mio.disconnect(); initMap(); }
-      }, { rootMargin: '400px 0px' });
-      mio.observe(mapEl);
-    } else initMap();
-  }
-
   /* ---------- Обратный отсчёт ---------- */
   const cd = { d: $('[data-cd="d"]'), h: $('[data-cd="h"]'), m: $('[data-cd="m"]') };
   if (cd.d) {
