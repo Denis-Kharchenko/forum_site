@@ -157,6 +157,7 @@ body.v2 .hero {
 
 /* Место: красные подписи и красная рамка-тень у карты */
 .v2 .place__list dt { color: var(--red); }
+.v2 .place__go-title { color: var(--red); }
 .v2 .place__map::before { border-color: var(--red); }
 
 /* Контакты: красные иконки и подписи, соцсети при наведении — красные */

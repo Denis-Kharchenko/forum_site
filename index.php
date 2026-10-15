@@ -296,13 +296,19 @@ $tiers    = [
         <div><dt>Дата</dt><dd><?= e($dateFull) ?></dd></div>
         <div><dt>Время</dt><dd><?= e($timeRange) ?></dd></div>
       </dl>
-      <div class="place__links">
-        <a class="btn btn--ghost" href="https://2gis.ru/spb/geo/30.351440%2C59.938782?m=30.351440%2C59.938782%2F17" target="_blank" rel="noopener">Открыть в 2ГИС <svg class="ico"><use href="#i-arrow"/></svg></a>
-        <a class="btn btn--ghost" href="https://yandex.ru/maps/?pt=30.351440%2C59.938782&amp;z=17&amp;l=map" target="_blank" rel="noopener">Яндекс Карты <svg class="ico"><use href="#i-arrow"/></svg></a>
-      </div>
     </div>
     <div class="place__map reveal">
+      <?php /* Карта временно отключена — вместо неё кнопки ниже. Скрипт в js/main.js сам ничего не делает, пока нет #placeMap.
       <div class="place__canvas" id="placeMap" role="region" aria-label="Карта: <?= e($set['address']) ?>" data-lat="59.938782" data-lon="30.351440" data-title="<?= e($set['venue']) ?>"></div>
+      */ ?>
+      <div class="place__canvas place__go">
+        <p class="place__go-title">Как добраться</p>
+        <p class="place__go-addr"><?= e($set['address']) ?></p>
+        <div class="place__links">
+          <a class="btn btn--blue btn--lg" href="https://2gis.ru/spb/geo/30.351440%2C59.938782?m=30.351440%2C59.938782%2F17" target="_blank" rel="noopener">Открыть в 2ГИС <svg class="ico"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--white btn--lg" href="https://yandex.ru/maps/?pt=30.351440%2C59.938782&amp;z=17&amp;l=map" target="_blank" rel="noopener">Яндекс Карты <svg class="ico"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
