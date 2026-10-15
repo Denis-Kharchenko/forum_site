@@ -93,7 +93,7 @@ function reg_button(string $class, string $label, bool $arrow = true): string
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
       <a href="#about">О форуме</a>
-      <a href="#program">Программа</a>
+      <a href="#program" class="nav__program">Программа</a>
       <a href="#partners">Партнёры</a>
       <a href="#speakers">Спикеры</a>
       <a href="#place">Место</a>
@@ -101,8 +101,10 @@ function reg_button(string $class, string $label, bool $arrow = true): string
       <a href="#gallery">Фото</a>
 <?php endif; ?>
       <a href="#contacts">Контакты</a>
+      <a href="navigation/" class="nav__navi">Навигация по форуму</a>
       <?= reg_button('nav__reg', 'Регистрация', false) ?>
     </nav>
+    <a href="navigation/" class="btn btn--blue header__cta header__navi"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Навигация по форуму</a>
     <?= reg_button('btn btn--blue header__cta', 'Регистрация', false) ?>
     <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
   </div>
@@ -208,7 +210,10 @@ function reg_button(string $class, string $label, bool $arrow = true): string
         <li><time><?= e($item['time']) ?></time><div><b><?= e($item['title']) ?></b><?php if ($item['place'] !== ''): ?><span><?= e($item['place']) ?></span><?php endif; ?></div></li>
 <?php endforeach; ?>
       </ol>
-      <?= reg_button('btn btn--blue btn--lg reveal', 'Зарегистрироваться') ?>
+      <div class="program__actions reveal">
+        <a href="navigation/#program" class="btn btn--outline btn--lg">Подробная программа <svg class="ico"><use href="#i-arrow"/></svg></a>
+        <?= reg_button('btn btn--blue btn--lg', 'Зарегистрироваться') ?>
+      </div>
     </div>
   </div>
 </section>

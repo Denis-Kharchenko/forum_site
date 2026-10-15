@@ -477,7 +477,8 @@ html { scroll-padding-top: calc(var(--header-h) + var(--announce-h) + 12px); }
   .hero__right .btn { font-size: 15px; padding-inline: 12px; }
   .hero__right .btn .ico { display: none; }
 }
-@media (max-width: 1080px) {
+/* Шапка с бургер-меню: пункты меню и две кнопки (навигация, регистрация) в строку уже не помещаются */
+@media (max-width: 1280px) {
   .burger { display: flex; }
   .header__cta { display: none; }
   /* Без размытия шапка перестаёт быть «контейнером» для меню — позиция одинакова во всех браузерах, включая Safari */
@@ -504,6 +505,8 @@ html { scroll-padding-top: calc(var(--header-h) + var(--announce-h) + 12px); }
   .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
   .nav .nav__reg { display: block; margin-top: 16px; padding: 14px 0; border: 0; background: #fff; color: var(--blue); text-align: center; }
   .nav .nav__reg:hover { color: var(--blue); opacity: .9; }
+}
+@media (max-width: 1080px) {
 
   .hero__grid { grid-template-columns: 1fr 1fr; }
   .hero__title { font-size: min(clamp(52px, calc(11vw / var(--z)), 120px), 15.4cqi); }

@@ -4,7 +4,7 @@ style/
 logos/
 
 # Будущая админка: база заявок и секреты хранятся только на сервере
-data/
+/data/
 config.local.php
 *.sqlite
 *.db

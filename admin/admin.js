@@ -237,7 +237,7 @@
         input(data.texts, 'thanks_text', 'Текст', { max: 300, wide: true }))
     ],
 
-    program: () => section('Программа', 'Пункты показываются на сайте в этом порядке.',
+    program: () => section('Программа', 'Короткая программа в блоке «Программа» на главной. Пункты показываются в этом порядке. Подробная программа по трекам и залам — на странице «Навигация и программа» (кнопка в шапке админки).',
       h('div', { class: 'list' }, data.program.map((it, i) => h('div', { class: 'row' },
         h('div', { class: 'row__num' }, String(i + 1)),
         h('div', { class: 'row__fields row__fields--program' },

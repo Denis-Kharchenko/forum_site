@@ -55,6 +55,10 @@ button, input { font: inherit; }
 .tab { min-height: 40px; padding: 6px 14px; border: 2px solid transparent; background: none; cursor: pointer; font-weight: 700; color: var(--ink-2); }
 .tab:hover { color: var(--blue); }
 .tab.is-active { color: var(--blue); border-bottom-color: var(--blue); }
+/* Переход на соседнюю страницу админки (навигация) */
+.pagelink { min-height: 40px; display: inline-flex; white-space: nowrap; align-items: center; padding: 6px 14px; border: 2px solid var(--blue); color: var(--blue); font-weight: 700; text-decoration: none; }
+.pagelink:hover { background: var(--blue); color: #fff; }
+.pagelink.is-current { background: var(--blue); color: #fff; }
 .bar__actions { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .bar__actions form { margin: 0; }
 .status { font-size: 13px; font-weight: 700; color: var(--ink-2); }
