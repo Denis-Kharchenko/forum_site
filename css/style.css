@@ -302,10 +302,11 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .place__list dd { margin: 0; font-weight: 700; }
 .place__map { position: relative; min-height: 400px; }
 .place__map::before { content: ""; position: absolute; inset: 20px -14px -14px 20px; border: 3px solid var(--blue); z-index: 0; }
-.place__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.place__go { position: absolute; inset: 0; border: 3px solid var(--blue); background: var(--blue-soft); z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 32px 24px; text-align: center; }
-.place__go-title { margin: 0; font-family: var(--f-display); text-transform: uppercase; letter-spacing: .08em; color: var(--blue); font-size: 15px; }
-.place__go-addr { margin: 0 0 20px; font-family: var(--f-display); font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
+.place__links { display: flex; flex-wrap: wrap; gap: 12px; }
+.place__shot { position: absolute; inset: 0; display: block; overflow: hidden; border: 3px solid var(--blue); background: var(--blue-soft); z-index: 1; }
+/* метка «АТС» на скрине — внизу слева, держим её в кадре при обрезке */
+.place__shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 24% 86%; transition: transform .5s var(--ease); }
+.place__shot:hover img { transform: scale(1.03); }
 
 /* ---------- Contacts ---------- */
 .contacts { background: #fff; }
