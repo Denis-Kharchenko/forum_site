@@ -303,7 +303,7 @@ $tiers    = [
     </div>
     <div class="place__map reveal">
       <a class="place__shot" href="https://yandex.ru/maps/?pt=30.351440%2C59.938782&amp;z=17&amp;l=map" target="_blank" rel="noopener" aria-label="Открыть место на карте: <?= e($set['address']) ?>">
-        <img src="<?= asset('assets/place-map.webp') ?>?v=<?= asset_v('assets/place-map.webp') ?>" alt="Карта: <?= e($set['venue']) ?>, <?= e($set['address']) ?>" width="761" height="694" loading="lazy" decoding="async">
+        <img src="<?= asset('assets/place-map.webp') ?>?v=<?= asset_v('assets/place-map.webp') ?>" alt="Карта: <?= e($set['venue']) ?>, <?= e($set['address']) ?>" width="835" height="720" loading="lazy" decoding="async">
       </a>
     </div>
   </div>

@@ -304,8 +304,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .place__map::before { content: ""; position: absolute; inset: 20px -14px -14px 20px; border: 3px solid var(--blue); z-index: 0; }
 .place__links { display: flex; flex-wrap: wrap; gap: 12px; }
 .place__shot { position: absolute; inset: 0; display: block; overflow: hidden; border: 3px solid var(--blue); background: var(--blue-soft); z-index: 1; }
-/* метка «АТС» на скрине — внизу слева, держим её в кадре при обрезке */
-.place__shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 24% 86%; transition: transform .5s var(--ease); }
+/* метка «АТС» на скрине — внизу, чуть левее центра, держим её в кадре при обрезке */
+.place__shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 42% 86%; transition: transform .5s var(--ease); }
 .place__shot:hover img { transform: scale(1.03); }
 
 /* ---------- Contacts ---------- */
