@@ -91,7 +91,7 @@
     reveals.forEach(el => io.observe(el));
   }
 
-  /* ---------- Карта: Leaflet + подложка CARTO/OSM, ключ не нужен (грузим, когда блок подъезжает к экрану) ---------- */
+  /* ---------- Карта: Leaflet + подложка OpenStreetMap, ключ не нужен (грузим, когда блок подъезжает к экрану) ---------- */
   const mapEl = $('#placeMap');
   if (mapEl) {
     const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min';
@@ -110,11 +110,12 @@
         const L = window.L;
         const pos = [+mapEl.dataset.lat, +mapEl.dataset.lon];
         const map = L.map(mapEl, { center: pos, zoom: 17, scrollWheelZoom: false });
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          subdomains: 'abcd', maxZoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
-        const icon = L.divIcon({ className: 'place__pin', html: '<span></span>',iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -28] });
+        const icon = L.divIcon({ className: 'place__pin', html: '<span></span>', iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -28] });
         L.marker(pos, { icon, title: mapEl.dataset.title }).addTo(map).bindPopup(mapEl.dataset.title);
       };
       document.head.appendChild(s);
