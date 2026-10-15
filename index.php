@@ -43,7 +43,9 @@ function reg_button(string $class, string $label, bool $arrow = true): string
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Форум работающей молодёжи — <?= e($dateFull) ?>, Санкт-Петербург</title>
   <meta name="description" content="Форум работающей молодёжи Санкт-Петербурга. <?= e($dateFull . ', ' . $timeRange . ', ' . $set['venue'] . ', ' . $set['address']) ?>.">
+  <link rel="icon" href="<?= $R ?>favicon.ico" sizes="any">
   <link rel="icon" href="<?= $R ?>favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="<?= $R ?>favicon-120.png" type="image/png" sizes="120x120">
   <link rel="icon" href="<?= $R ?>favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="<?= $R ?>apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
