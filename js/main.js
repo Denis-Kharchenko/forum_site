@@ -91,17 +91,32 @@
     reveals.forEach(el => io.observe(el));
   }
 
-  /* ---------- Карта 2ГИС (грузим, когда блок подъезжает к экрану) ---------- */
+  /* ---------- Карта: Leaflet + подложка CARTO/OSM, ключ не нужен (грузим, когда блок подъезжает к экрану) ---------- */
   const mapEl = $('#placeMap');
   if (mapEl) {
+    const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min';
     const initMap = () => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = LEAFLET + '.css';
+      css.integrity = 'sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==';
+      css.crossOrigin = 'anonymous';
+      document.head.appendChild(css);
       const s = document.createElement('script');
-      s.src = 'https://maps.api.2gis.ru/2.0/loader.js?pkg=full';
-      s.onload = () => window.DG.then(() => {
+      s.src = LEAFLET + '.js';
+      s.integrity = 'sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==';
+      s.crossOrigin = 'anonymous';
+      s.onload = () => {
+        const L = window.L;
         const pos = [+mapEl.dataset.lat, +mapEl.dataset.lon];
-        const map = window.DG.map(mapEl, { center: pos, zoom: 17, scrollWheelZoom: false, fullscreenControl: false });
-        window.DG.marker(pos).addTo(map).bindPopup(mapEl.dataset.title);
-      });
+        const map = L.map(mapEl, { center: pos, zoom: 17, scrollWheelZoom: false });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          subdomains: 'abcd', maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        }).addTo(map);
+        const icon = L.divIcon({ className: 'place__pin', html: '<span></span>',iconSize: [28, 28], iconAnchor: [14, 28], popupAnchor: [0, -28] });
+        L.marker(pos, { icon, title: mapEl.dataset.title }).addTo(map).bindPopup(mapEl.dataset.title);
+      };
       document.head.appendChild(s);
     };
     if ('IntersectionObserver' in window) {
