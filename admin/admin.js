@@ -217,7 +217,15 @@
         h('div', { class: 'grid2' + (data.announcement.enabled ? '' : ' is-disabled') },
           input(data.announcement, 'text', 'Текст объявления', { max: 200, wide: true, placeholder: 'Регистрация на форум открыта!' }),
           input(data.announcement, 'link_text', 'Текст кнопки (необязательно)', { max: 40, placeholder: 'Зарегистрироваться' }),
-          input(data.announcement, 'link_url', 'Ссылка кнопки', { max: 500, placeholder: 'пусто — ссылка на регистрацию' })))
+          input(data.announcement, 'link_url', 'Ссылка кнопки', { max: 500, placeholder: 'пусто — ссылка на регистрацию' }))),
+      section('Онлайн-трансляция', 'Плеер с прямым эфиром появляется на главной сразу под баннером, в меню — пункт «Эфир». Подходит ссылка на эфир в VK Видео, RuTube или YouTube либо код встраивания («Поделиться → Встроить» / «Экспортировать», вставьте целиком <iframe …>). Звук посетитель включает сам: браузеры не дают запускать видео со звуком.',
+        h('label', { class: 'check' + (data.stream.enabled && data.stream.url ? ' is-live' : '') },
+          h('input', { type: 'checkbox', checked: !!data.stream.enabled, onchange: e => { data.stream.enabled = e.target.checked; markDirty(); render(); } }),
+          h('span', {}, data.stream.enabled ? 'Трансляция включена — после «Сохранить» она на сайте' : 'Показывать трансляцию на сайте')),
+        h('div', { class: 'grid2' + (data.stream.enabled ? '' : ' is-disabled') },
+          input(data.stream, 'url', 'Ссылка на эфир или код встраивания', { max: 2000, wide: true, placeholder: 'https://vkvideo.ru/video-…  или  https://rutube.ru/live/video/…' }),
+          input(data.stream, 'title', 'Заголовок над плеером', { max: 120, wide: true, placeholder: 'Прямая трансляция форума' })),
+        data.stream.enabled && !String(data.stream.url || '').trim() ? h('p', { class: 'muted small' }, 'Без ссылки на эфир блок на сайте не появится.') : '')
     ],
 
     texts: () => [
@@ -342,6 +350,7 @@
       const rejected = [
         [data.settings.reg_url, json.content.settings.reg_url, 'ссылка на регистрацию'],
         [data.announcement.link_url, json.content.announcement.link_url, 'ссылка кнопки объявления'],
+        [data.stream.url, json.content.stream.url, 'ссылка на трансляцию (нужна ссылка на эфир VK Видео, RuTube или YouTube)'],
         [data.contacts.vk, json.content.contacts.vk, 'ссылка на VK'],
         [data.contacts.telegram, json.content.contacts.telegram, 'ссылка на Telegram'],
         [data.contacts.email, json.content.contacts.email, 'email'],

@@ -8,6 +8,11 @@
     "address": "Санкт-Петербург, ул. Некрасова, 7",
     "mode": "before"
   },
+  "stream": {
+    "enabled": false,
+    "title": "Прямая трансляция форума",
+    "url": ""
+  },
   "announcement": {
     "enabled": false,
     "text": "Регистрация на форум открыта!",

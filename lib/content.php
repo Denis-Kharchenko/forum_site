@@ -86,6 +86,53 @@ function url_field($v): string
     return preg_match('~^https?://[^\s/?#<>"\'`]+\.[^\s/?#<>"\'`]+([/?#][^\s<>"\'`]*)?$~iu', $s) ? $s : '';
 }
 
+/* ---------- Онлайн-трансляция ----------
+   В админку вставляют ссылку на эфир (VK Видео, RuTube, YouTube) или целиком код <iframe> «Поделиться → Встроить».
+   Храним ссылку; адрес плеера для сайта собирает stream_embed(). */
+
+function stream_url_field($v): string
+{
+    $s = trim(is_scalar($v) ? (string)$v : '');
+    // код встраивания: берём только адрес из src="…"
+    if (preg_match('~<iframe[^>]*\ssrc=["\']([^"\']+)["\']~i', $s, $m)) $s = html_entity_decode($m[1], ENT_QUOTES);
+    return url_field(mb_substr($s, 0, 500));
+}
+
+// Ссылка на эфир → адрес плеера для <iframe>. null — ссылку не удалось распознать
+function stream_embed(string $url): ?array
+{
+    if ($url === '') return null;
+    $p = parse_url($url);
+    $host = strtolower(preg_replace('/^(www\.|m\.)/', '', $p['host'] ?? ''));
+    $path = $p['path'] ?? '';
+    parse_str($p['query'] ?? '', $q);
+
+    // VK Видео: vk.com/video-123_456, vkvideo.ru/video-123_456, …?z=video-123_456, video_ext.php?oid=…&id=…
+    if (in_array($host, ['vk.com', 'vk.ru', 'vkvideo.ru', 'live.vkvideo.ru'], true)) {
+        if (str_ends_with($path, '/video_ext.php') && isset($q['oid'], $q['id'])) {
+            return ['provider' => 'VK Видео', 'src' => 'https://vk.com/video_ext.php?' . http_build_query(['oid' => $q['oid'], 'id' => $q['id'], 'hash' => $q['hash'] ?? null, 'hd' => 2, 'autoplay' => 1])];
+        }
+        if (preg_match('~video(-?\d+)_(\d+)~', $path . ' ' . ($q['z'] ?? ''), $m)) {
+            return ['provider' => 'VK Видео', 'src' => 'https://vk.com/video_ext.php?' . http_build_query(['oid' => $m[1], 'id' => $m[2], 'hd' => 2, 'autoplay' => 1])];
+        }
+        return null;
+    }
+    // RuTube: rutube.ru/video/ID/, rutube.ru/live/video/ID/, rutube.ru/play/embed/ID
+    if ($host === 'rutube.ru' && preg_match('~/(?:live/)?(?:video|play/embed)/(?:private/)?([0-9a-f]{32})~i', $path, $m)) {
+        $src = 'https://rutube.ru/play/embed/' . $m[1] . (isset($q['p']) ? '?p=' . rawurlencode((string)$q['p']) : '');
+        return ['provider' => 'RuTube', 'src' => $src];
+    }
+    // YouTube: watch?v=ID, youtu.be/ID, /live/ID, /embed/ID
+    if (in_array($host, ['youtube.com', 'youtu.be', 'youtube-nocookie.com'], true)) {
+        $id = $host === 'youtu.be' ? ltrim($path, '/') : ($q['v'] ?? (preg_match('~/(?:live|embed|shorts)/([\w-]{11})~', $path, $m) ? $m[1] : ''));
+        if (preg_match('/^[\w-]{11}$/', (string)$id)) {
+            return ['provider' => 'YouTube', 'src' => 'https://www.youtube-nocookie.com/embed/' . $id . '?autoplay=1&mute=1&rel=0'];
+        }
+        return null;
+    }
+    return null;
+}
+
 function image_field($v): string
 {
     $s = str_field($v, 300);
@@ -149,6 +196,7 @@ function normalize_content(array $d): array
     $c = is_array($d['contacts'] ?? null) ? $d['contacts'] : [];
     $s = is_array($d['settings'] ?? null) ? $d['settings'] : [];
     $a = is_array($d['announcement'] ?? null) ? $d['announcement'] : [];
+    $st = is_array($d['stream'] ?? null) ? $d['stream'] : [];
     $t = is_array($d['texts'] ?? null) ? $d['texts'] : [];
     $email = fn($v) => filter_var(str_field($v, 120), FILTER_VALIDATE_EMAIL) ?: '';
     $time = fn($v, $fallback) => preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', str_field($v, 5)) ? str_field($v, 5) : $fallback;
@@ -163,6 +211,12 @@ function normalize_content(array $d): array
             'venue'      => str_field($s['venue'] ?? '', 120),
             'address'    => str_field($s['address'] ?? '', 200),
             'mode'       => ($s['mode'] ?? '') === 'after' ? 'after' : 'before',
+        ],
+        'stream' => [
+            'enabled' => !empty($st['enabled']),
+            'title'   => str_field($st['title'] ?? '', 120),
+            // нераспознанная ссылка не сохраняется — админка сообщит «не принято»
+            'url'     => stream_embed($su = stream_url_field($st['url'] ?? '')) ? $su : '',
         ],
         'announcement' => [
             'enabled'   => !empty($a['enabled']),

@@ -570,6 +570,19 @@ html { scroll-padding-top: calc(var(--header-h) + var(--announce-h) + 12px); }
   .place__map::before { inset: 12px -8px -8px 12px; }
 }
 
+/* ---------- Прямая трансляция (включается в админке: «Настройки → Онлайн-трансляция») ---------- */
+.live { background: var(--ink); color: #fff; padding-block: clamp(32px, calc(4vw / var(--z)), 64px); }
+.live__head { display: flex; align-items: center; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 20px; }
+.live .h2 { color: #fff; margin: 0; }
+.live__badge { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--red); color: #fff; font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .12em; font-size: 15px; line-height: 1; }
+.live__badge i { width: 10px; height: 10px; border-radius: 50%; background: #fff; animation: livePulse 1.4s ease-in-out infinite; }
+@keyframes livePulse { 50% { opacity: .25; } }
+.live__player { position: relative; aspect-ratio: 16 / 9; background: #000; border: 3px solid var(--blue); }
+.live__player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.live__note { margin: 12px 0 0; font-size: 14px; color: rgba(255, 255, 255, .65); }
+.nav a.nav__live { color: var(--red); display: inline-flex; align-items: center; gap: 6px; }
+.nav a.nav__live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: livePulse 1.4s ease-in-out infinite; position: static; transform: none; }
+
 /* ---------- Общая программа по трекам (сетка из админки «Навигация и программа») ---------- */
 .sgrid { background: var(--paper); }
 .sgrid__wrap { overflow-x: auto; border-top: 3px solid var(--blue); background: #fff; }

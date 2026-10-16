@@ -14,6 +14,8 @@ $set   = $content['settings'];
 $txt   = $content['texts'];
 $after = $set['mode'] === 'after';
 $hasGallery = (bool)array_filter($content['gallery'], fn($g) => $g['src'] !== '');
+// Онлайн-трансляция из админки: включена и ссылка распознана — плеер под баннером
+$stream = $content['stream']['enabled'] ? stream_embed($content['stream']['url']) : null;
 $dateFull  = date_human($set['date']);
 $dateShort = date_human($set['date'], false);
 $timeRange = $set['time_start'] . '–' . $set['time_end'];
@@ -95,6 +97,9 @@ function reg_button(string $class, string $label, bool $arrow = true): string
       <span class="logo__text">Форум<br>работающей молодёжи<br>Санкт-Петербурга</span>
     </a>
     <nav class="nav" id="nav" aria-label="Основная навигация">
+<?php if ($stream): ?>
+      <a href="#live" class="nav__live">Эфир</a>
+<?php endif; ?>
       <a href="#about">О форуме</a>
       <a href="#program" class="nav__program">Программа</a>
       <a href="#partners">Партнёры</a>
@@ -145,6 +150,22 @@ function reg_button(string $class, string $label, bool $arrow = true): string
   </div>
 </section>
 
+<?php if ($stream): ?>
+<!-- ============ ПРЯМАЯ ТРАНСЛЯЦИЯ ============ -->
+<section class="section live" id="live" aria-labelledby="liveTitle">
+  <div class="container">
+    <div class="live__head">
+      <span class="live__badge"><i aria-hidden="true"></i>В эфире</span>
+      <h2 class="h2 h2--sm" id="liveTitle"><?= e($content['stream']['title'] ?: 'Прямая трансляция') ?></h2>
+    </div>
+    <div class="live__player">
+      <iframe src="<?= e($stream['src']) ?>" title="<?= e(($content['stream']['title'] ?: 'Прямая трансляция') . ' — ' . $stream['provider']) ?>" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <p class="live__note">Если видео не запускается, нажмите на плеер. Звук включается в самом плеере.</p>
+  </div>
+</section>
+
+<?php endif; ?>
 <!-- ============ MARQUEE ============ -->
 <div class="marquee" aria-hidden="true">
   <div class="marquee__track">
