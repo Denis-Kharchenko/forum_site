@@ -68,7 +68,7 @@ function showView(name) {
   $$('.view').forEach(v => v.classList.toggle('is-active', v.id === VIEWS[name]));
   if (history.replaceState) history.replaceState(null, '', '#' + name);
   if (name === 'nav') requestAnimationFrame(() => plan.fit(false));
-  if (name === 'program') { prog.page = -1; requestAnimationFrame(renderProgram); }
+  if (name === 'program') { prog.page = -1; requestAnimationFrame(() => { renderProgram(); if (prog.track === GRID) scrollGridToNow(); }); }
 }
 $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 
@@ -424,14 +424,17 @@ const ALL = 'all';   // запись относится ко всем трека
 const trackOf = it => it.track || ALL;
 const trackColor = id => TRACKS.find(t => t.id === id)?.color || '#8a8a95';
 
-const prog = { track: TRACKS[0].id, page: 0, perPage: 6 };
-$('#progChips').innerHTML = TRACKS.map((t, i) =>
+// «Все треки» — таблица «время × треки» целиком, с прокруткой вместо страниц. Открыта по умолчанию
+const GRID = '__grid';
+const prog = { track: GRID, page: 0, perPage: 6 };
+$('#progChips').innerHTML = [{ id: GRID, name: 'Все треки', color: '#111114' }, ...TRACKS].map((t, i) =>
   `<button type="button" class="chip chip--track" role="tab" style="${esc(trackVars(t.color))}" aria-selected="${i === 0}" data-track="${esc(t.id)}">${esc(t.name)}</button>`).join('');
 function setTrack(id) {
   prog.track = id; prog.page = -1;
   $$('#progChips .chip').forEach(x => x.setAttribute('aria-selected', String(x.dataset.track === id)));
   setTimelineColor(id);
   renderProgram();
+  if (id === GRID) scrollGridToNow();
 }
 $$('#progChips .chip').forEach(ch => ch.addEventListener('click', () => setTrack(ch.dataset.track)));
 function setTimelineColor(id) {
@@ -456,8 +459,74 @@ function slotHTML(it, st) {
   </li>`;
 }
 
+/* Таблица всех треков: строка — интервал, столбец — трек. Одинаковые записи в соседних треках —
+   одна ячейка на несколько столбцов, запись «для всех треков» — на всю строку.
+   Тот же расчёт, что в админке (admin/navigation.js → buildGrid) и на главной (lib/schedule.php). */
+function gridRows() {
+  const ids = TRACKS.map(t => t.id), slots = new Map();
+  ITEMS.forEach(it => {
+    const k = it.start + '|' + (it.end || '');
+    if (!slots.has(k)) slots.set(k, { start: it.start, end: it.end || '', all: [], by: {} });
+    const s = slots.get(k);
+    if (trackOf(it) === ALL) s.all.push(it);
+    else if (ids.includes(it.track)) (s.by[it.track] ||= []).push(it);
+  });
+  const sig = list => list.map(it => [it.kind, it.title, it.speaker, it.room, it.place].join('\u0001')).join('\u0002');
+  return [...slots.values()].sort((a, b) => toMin(a.start) - toMin(b.start) || toMin(a.end || a.start) - toMin(b.end || b.start)).map(r => {
+    r.cells = [];
+    if (Object.keys(r.by).length) for (let c = 0; c < ids.length; c++) {
+      const list = r.by[ids[c]] || [], span = [ids[c]];
+      while (list.length && c + 1 < ids.length && sig(r.by[ids[c + 1]] || []) === sig(list)) span.push(ids[++c]);
+      r.cells.push({ span, list });
+    }
+    return r;
+  });
+}
+function gridItemHTML(it) {
+  const place = placeOf(it);
+  return `<div class="pg-item">
+    ${it.kind && it.kind !== 'Общее' ? `<span class="pg-kind">${esc(it.kind)}</span>` : ''}
+    <b>${esc(it.title)}</b>
+    ${it.speaker && it.speaker !== '?' ? `<span class="pg-speaker">${esc(it.speaker)}</span>` : ''}
+    ${place ? (roomActive(it.room)
+      ? `<button type="button" class="pg-place btn-map" data-room="${esc(it.room)}"><svg class="ico"><use href="#i-pin"/></svg>${esc(place)}</button>`
+      : `<span class="pg-place"><svg class="ico"><use href="#i-pin"/></svg>${esc(place)}</span>`) : ''}
+  </div>`;
+}
+function renderGrid() {
+  const st = nowState(), n = TRACKS.length, rows = gridRows();
+  const slotState = r => {
+    const it = { start: r.start, end: r.end };
+    return isNow(it, st) ? ' is-now' : isPast(it, st) ? ' is-past' : '';
+  };
+  const timeTh = (r, span) => `<th scope="row" class="pg-time"${span > 1 ? ` rowspan="${span}"` : ''}><b>${esc(r.start)}</b>${r.end ? `<small>до ${esc(r.end)}</small>` : ''}</th>`;
+  const body = rows.map(r => {
+    const cls = slotState(r), both = r.all.length && r.cells.length;
+    let html = '';
+    if (r.all.length) html += `<tr class="pg-row--all${cls}">${timeTh(r, both ? 2 : 1)}<td colspan="${n}">${r.all.map(gridItemHTML).join('')}</td></tr>`;
+    if (r.cells.length) html += `<tr class="${cls.trim()}">${both ? '' : timeTh(r, 1)}${r.cells.map(c => {
+      const color = trackColor(c.span[0]);
+      return `<td${c.span.length > 1 ? ` colspan="${c.span.length}"` : ''}${c.list.length ? ` style="--c:${esc(color)}"` : ' class="is-empty"'}>${c.list.map(gridItemHTML).join('')}</td>`;
+    }).join('')}</tr>`;
+    return html;
+  }).join('');
+  $('#pgridTable').style.setProperty('--n', n);
+  $('#pgridTable').innerHTML = `<thead><tr><th class="pg-time">Время</th>${TRACKS.map(t => `<th style="--c:${esc(t.color)}">${esc(t.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
+  $('#progEmpty').hidden = rows.length > 0;
+}
+// Прокрутить к текущей (или ближайшей) строке — только при открытии, не при ежеминутном обновлении
+function scrollGridToNow() {
+  const wrap = $('#pgrid'), row = wrap.querySelector('tbody tr.is-now') || wrap.querySelector('tbody tr:not(.is-past)');
+  wrap.scrollTop = 0;
+  if (row && nowState().today) wrap.scrollTop = row.offsetTop - wrap.querySelector('thead').offsetHeight;
+}
+
 const MAX_ROW = 84;   // телефон: высота строки, если лекций мало
 function renderProgram() {
+  const grid = prog.track === GRID;
+  $('#pgrid').hidden = !grid;
+  $('#timeline').hidden = grid;
+  if (grid) { $('#pager').hidden = true; renderGrid(); return; }
   const list = $('#timeline'), st = nowState();
   const items = ITEMS.filter(it => trackOf(it) === ALL || trackOf(it) === prog.track);
   $('#progEmpty').hidden = items.length > 0;
@@ -490,12 +559,14 @@ function renderProgram() {
 }
 $('#pgPrev').addEventListener('click', () => { prog.page--; renderProgram(); });
 $('#pgNext').addEventListener('click', () => { prog.page++; renderProgram(); });
-$('#timeline').addEventListener('click', e => {
+const toMap = e => {
   const b = e.target.closest('.btn-map');
   if (!b) return;
   showView('nav');
   requestAnimationFrame(() => (WEB ? selectRoom(b.dataset.room, true) : playRoute(b.dataset.room)));
-});
+};
+$('#timeline').addEventListener('click', toMap);
+$('#pgrid').addEventListener('click', toMap);
 function markNow() { if ($('#view-program').classList.contains('is-active')) renderProgram(); }
 setInterval(markNow, 60000);
 window.addEventListener('resize', markNow);
@@ -548,7 +619,7 @@ let idleTimer;
 function resetKiosk() {
   clearSelection();
   resetCards();
-  prog.track = TRACKS[0].id;
+  prog.track = GRID;
   $$('#progChips .chip').forEach((x, i) => x.setAttribute('aria-selected', String(i === 0)));
   setTimelineColor(prog.track);
   renderFloor(KIOSK.floor);
