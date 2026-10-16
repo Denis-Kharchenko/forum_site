@@ -66,8 +66,8 @@ button { cursor: pointer; }
 .panel { background: var(--white); padding: 16px 20px 18px; border-top: 4px solid var(--red); margin-bottom: 20px; }
 .panel h2 { font-family: var(--f-display); text-transform: uppercase; color: var(--blue); font-size: 20px; margin: 0 0 4px; }
 .panel p { margin: 0 0 12px; color: var(--ink-2); font-size: 13px; }
-.tracks-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
-.track-edit { display: grid; grid-template-columns: 44px 1fr 40px; gap: 8px; align-items: center; }
+.tracks-edit { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; }
+.track-edit { display: grid; grid-template-columns: 22px 44px 1fr 36px 36px 40px; gap: 6px; align-items: center; }
 .track-edit .del:disabled { opacity: .3; cursor: default; background: none; color: var(--ink-2); }
 .add-track { margin-top: 12px; }
 .track-edit input[type=color] { width: 44px; height: 42px; padding: 2px; border: 2px solid var(--line); background: var(--white); cursor: pointer; }
@@ -150,4 +150,66 @@ td.bad input, td.bad select { border-color: var(--red); background: var(--red-so
 .empty { padding: 32px; text-align: center; color: var(--ink-2); }
 .add-row { margin-top: 12px; }
 .hint { color: var(--ink-2); font-size: 13px; margin: 16px 0 0; }
+
+.track-pos { font-family: var(--f-display); font-weight: 600; color: var(--ink-2); text-align: center; font-variant-numeric: tabular-nums; }
+.move { width: 36px; height: 40px; border: 0; background: none; color: var(--ink-2); display: grid; place-items: center; }
+.move:hover:not(:disabled) { color: var(--blue); background: var(--blue-soft); }
+.move:disabled { opacity: .25; cursor: default; }
+
+/* вид программы: список / таблица */
+.views { display: flex; margin-bottom: 12px; border: 2px solid var(--blue); width: max-content; }
+.vtab { min-height: 42px; padding: 0 20px; border: 0; background: var(--white); color: var(--blue); font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: 15px; }
+.vtab[aria-selected="true"] { background: var(--blue); color: var(--white); }
+
+/* таблица «время × треки» */
+.grid-note { margin: 0 0 12px; padding: 10px 14px; background: #fff3d6; color: #6b4600; font-weight: 600; font-size: 14px; }
+.grid-wrap { background: var(--white); border-top: 4px solid var(--blue); overflow-x: auto; }
+table.grid { min-width: calc(100px + var(--n, 5) * 200px); table-layout: fixed; border-collapse: separate; border-spacing: 0; }
+.grid th, .grid td { border-right: 1px solid var(--blue-soft); border-bottom: 1px solid var(--blue-soft); padding: 6px; vertical-align: top; }
+.grid thead th { box-shadow: inset 0 4px 0 var(--c, var(--ink-2)); padding: 12px 8px 10px; color: var(--ink); font-size: 13px; position: sticky; top: 0; }
+.grid .gtime { width: 100px; position: sticky; left: 0; z-index: 1; background: var(--white); }
+.grid thead .gtime { z-index: 2; color: var(--ink-2); }
+.gtime__btn { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 6px 8px; cursor: pointer; }
+.gtime__btn b { display: block; font-family: var(--f-display); font-size: 20px; color: var(--blue); font-variant-numeric: tabular-nums; }
+.gtime__btn span { font-size: 13px; color: var(--ink-2); font-weight: 600; }
+.gtime__btn:hover, .gtime__btn:focus-visible { background: var(--blue-soft); }
+.gtime__btn:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
+.grid td:not(.is-empty) { background: color-mix(in srgb, var(--c) 8%, var(--white)); box-shadow: inset 4px 0 0 var(--c); }
+.grid .grow--all td { background: var(--blue-soft); box-shadow: inset 4px 0 0 var(--ink-2); }
+.gcell { display: grid; gap: 6px; }
+.gcard { all: unset; box-sizing: border-box; display: grid; gap: 2px; padding: 8px 10px; background: var(--white); border: 1px solid #d6dbea; cursor: pointer; text-align: left; }
+.gcard:hover { border-color: var(--blue); }
+.gcard:focus-visible { outline: 3px solid var(--blue); outline-offset: 1px; }
+.gcard small { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: var(--ink-2); }
+.gcard b { font-size: 14px; line-height: 1.3; }
+.gcard b i { color: var(--red); font-style: normal; }
+.gcard span { font-size: 12.5px; color: var(--ink-2); line-height: 1.3; }
+.gcard em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--blue); }
+.grow--all .gcard { text-align: center; justify-items: center; }
+.gacts { display: flex; gap: 4px; opacity: .35; transition: opacity .15s; }
+.grid td:hover .gacts, .gacts:focus-within, .grid td.is-empty .gacts { opacity: 1; }
+.grid td.is-empty .gcell { min-height: 72px; align-content: center; justify-items: center; }
+.gact { min-width: 34px; height: 30px; padding: 0 8px; border: 1px dashed var(--line); background: var(--white); color: var(--blue); font-weight: 700; font-size: 14px; }
+.gact:hover { border-style: solid; border-color: var(--blue); background: var(--blue-soft); }
+.gempty { padding: 32px; text-align: center; color: var(--ink-2); }
+@media (hover: none) { .gacts { opacity: 1; } }
+
+/* окно правки записи */
+.gdlg { width: min(560px, calc(100vw - 32px)); border: 0; border-top: 4px solid var(--red); padding: 20px 22px; box-shadow: 0 20px 60px rgba(17, 17, 20, .3); }
+.gdlg::backdrop { background: rgba(17, 17, 20, .45); }
+.gdlg h3 { font-family: var(--f-display); text-transform: uppercase; color: var(--blue); font-size: 20px; margin: 0 0 14px; }
+.gfields { display: grid; gap: 12px; }
+.gf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gf { display: grid; gap: 4px; font-weight: 700; font-size: 13px; }
+.gf input, .gf select { width: 100%; min-height: 42px; padding: 0 10px; border: 2px solid var(--line); background: var(--white); font-weight: 500; font-size: 15px; }
+.gf input:focus, .gf select:focus { border-color: var(--blue); outline: none; }
+.gf .other { margin-top: 6px; }
+.gf-check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.gf-check input { width: 18px; height: 18px; margin: 0; }
+.gf-note { margin: 0; padding: 8px 12px; background: var(--blue-soft); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.gdlg__acts { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.gdlg__sp { flex: 1; }
+.btn--danger { border-color: var(--red); color: var(--red); }
+.btn--danger:hover { background: var(--red-soft); }
+
 [hidden] { display: none !important; }

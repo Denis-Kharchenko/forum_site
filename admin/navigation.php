@@ -105,13 +105,27 @@ $nav = '../navigation/';
 
   <section class="panel" aria-labelledby="tracksTitle">
     <h2 id="tracksTitle">Треки</h2>
-    <p>Названия и цвета треков — так они выглядят во вкладке «Программа» в навигации на сайте и на стойках.</p>
+    <p>Названия, цвета и порядок треков — так они выглядят во вкладке «Программа» в навигации, на стойках и в программе на главной сайта. Стрелки двигают трек раньше или позже.</p>
     <div class="tracks-edit" id="tracksEdit"></div>
     <button type="button" class="btn add-track" id="btnAddTrack">+ Добавить трек</button>
   </section>
 
   <ul class="issues" id="issues" hidden></ul>
 
+  <div class="views" role="tablist" aria-label="Вид программы">
+    <button type="button" class="vtab" role="tab" data-view="list" aria-selected="true">Список</button>
+    <button type="button" class="vtab" role="tab" data-view="grid" aria-selected="false">Таблица</button>
+  </div>
+
+  <!-- Таблица: время × треки, как в общей программе. Правки сразу попадают в список -->
+  <div data-for="grid" hidden>
+    <p class="grid-note" id="gridNote" hidden></p>
+    <div class="grid-wrap"><table class="grid" id="grid"></table></div>
+    <button type="button" class="btn add-row" id="btnAddSlot">+ Добавить время</button>
+    <p class="hint">Таблица показывает ту же программу, что и список: строки — время, столбцы — треки в заданном порядке. Нажмите на запись, чтобы изменить её, на время — чтобы сдвинуть всю строку. «+» добавляет запись в ячейку, «→» растягивает ячейку на соседний трек (одна и та же лекция в нескольких треках), «←» сужает обратно. Запись «для всех треков» занимает всю строку. После правок нажмите «Сохранить» — изменения попадут в навигацию, на стойки и в программу на сайте.</p>
+  </div>
+
+  <div data-for="list">
   <div class="track-tabs" id="trackTabs" role="tablist" aria-label="Показать трек"></div>
 
   <div class="table-wrap">
@@ -135,12 +149,28 @@ $nav = '../navigation/';
   </div>
   <button type="button" class="btn add-row" id="btnAdd">+ Добавить лекцию</button>
   <p class="hint">Сохранить — <kbd>Ctrl</kbd>+<kbd>S</kbd>. Пока вы работаете, черновик хранится в этом браузере: если вкладка закроется или пропадёт связь, при следующем открытии страницы админка предложит его восстановить. Кнопка «Копировать» рядом с записью добавляет такую же лекцию сразу после неё. Записи автоматически сортируются по времени при сохранении. Галочка «Применить ко всем трекам» показывает запись во всех треках — для открытия, обеда, нетворкинга. Если одно и то же место занято двумя лекциями одновременно, админка предупредит.</p>
+  </div>
   </section>
+
+  <dialog class="gdlg" id="gdlg" aria-labelledby="gTitle">
+    <form method="dialog" id="gform">
+      <h3 id="gTitle"></h3>
+      <div class="gfields" id="gFields"></div>
+      <div class="gdlg__acts">
+        <button type="button" class="btn btn--danger" id="gDel">Удалить</button>
+        <span class="gdlg__sp"></span>
+        <button type="submit" class="btn btn--ghost" value="cancel" formnovalidate>Отмена</button>
+        <button type="submit" class="btn btn--primary" value="ok">Готово</button>
+      </div>
+    </form>
+  </dialog>
 </main>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="1"/><path d="M4 16V4a1 1 0 0 1 1-1h11"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></symbol>
 </svg>
 

@@ -109,3 +109,59 @@ function normalize_schedule(array $d, string $updated): array
     // Пустой объект rooms должен остаться объектом {}, а не массивом []
     return ['date' => $date, 'updated' => $updated, 'tracks' => $tracks, 'rooms' => (object)$rooms, 'items' => $items];
 }
+
+/* ---------- Сетка «время × треки» для общей программы на сайте ----------
+   Тот же расчёт, что у вкладки «Таблица» в админке (admin/navigation.js → buildGrid):
+   строка — интервал «начало–конец», столбец — трек. Одинаковые записи в соседних треках
+   сливаются в одну ячейку на несколько столбцов, запись «для всех треков» — на всю строку. */
+
+function schedule_grid(array $s): array
+{
+    $trackIds = array_column($s['tracks'], 'id');
+    $slots = [];
+    foreach ($s['items'] as $it) {
+        if ($it['start'] === '' || $it['title'] === '') continue;
+        $key = $it['start'] . '|' . $it['end'];
+        $slots[$key] ??= ['start' => $it['start'], 'end' => $it['end'], 'all' => [], 'by' => []];
+        if ($it['track'] === 'all') $slots[$key]['all'][] = $it;
+        elseif (in_array($it['track'], $trackIds, true)) $slots[$key]['by'][$it['track']][] = $it;
+    }
+    uasort($slots, fn($a, $b) => [$a['start'], $a['end']] <=> [$b['start'], $b['end']]);
+
+    $sig = fn(array $list) => json_encode(array_map(fn($i) => [$i['kind'], $i['title'], $i['speaker'], $i['room'], $i['place']], $list));
+    $rows = [];
+    foreach ($slots as $slot) {
+        $cells = [];
+        if ($slot['by']) {
+            for ($c = 0, $n = count($trackIds); $c < $n; $c++) {
+                $list = $slot['by'][$trackIds[$c]] ?? [];
+                $span = [$trackIds[$c]];
+                while ($list && $c + 1 < $n && $sig($slot['by'][$trackIds[$c + 1]] ?? []) === $sig($list)) {
+                    $span[] = $trackIds[++$c];
+                }
+                $cells[] = ['tracks' => $span, 'items' => $list];
+            }
+        }
+        $rows[] = ['start' => $slot['start'], 'end' => $slot['end'], 'all' => $slot['all'], 'cells' => $cells];
+    }
+    return $rows;
+}
+
+// Названия помещений: из navigation/data/rooms.js (t1, иначе t3) с правками из админки
+function schedule_room_names(array $s): array
+{
+    $names = [];
+    $js = (string)@file_get_contents(__DIR__ . '/../navigation/data/rooms.js');
+    if (preg_match_all("~\{\s*id:\s*'([^']+)'[^\n]*~u", $js, $m, PREG_SET_ORDER)) {
+        foreach ($m as [$line, $id]) {
+            if (preg_match("~\bt1:\s*\[([^\]]*)\]~u", $line, $t) || preg_match("~\bt3:\s*\[([^\]]*)\]~u", $line, $t)) {
+                preg_match_all("~'([^']*)'~u", $t[1], $parts);
+                $names[$id] = str_replace('- ', '', implode(' ', $parts[1]));
+            }
+        }
+    }
+    foreach ((array)$s['rooms'] as $id => $o) {
+        if (isset($o['name']) && trim($o['name']) !== '') $names[$id] = trim($o['name']);
+    }
+    return $names;
+}

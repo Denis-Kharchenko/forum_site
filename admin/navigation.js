@@ -167,12 +167,16 @@ function rowHTML(it = {}) {
 }
 function renderTracks() {
   $('#tracksEdit').innerHTML = tracks.map((t, i) => `<div class="track-edit">
+      <span class="track-pos" aria-hidden="true">${i + 1}</span>
       <input type="color" value="${esc(t.color)}" data-t="${i}" data-k="color" aria-label="Цвет: ${esc(t.name)}">
       <input type="text" value="${esc(t.name)}" data-t="${i}" data-k="name" aria-label="Название трека ${i + 1}" maxlength="40">
+      <button type="button" class="move" data-move-track="${i}" data-dir="-1" aria-label="Сдвинуть трек «${esc(t.name)}» раньше" title="Раньше"${i === 0 ? ' disabled' : ''}><svg class="ico"><use href="#i-left"/></svg></button>
+      <button type="button" class="move" data-move-track="${i}" data-dir="1" aria-label="Сдвинуть трек «${esc(t.name)}» позже" title="Позже"${i === tracks.length - 1 ? ' disabled' : ''}><svg class="ico"><use href="#i-right"/></svg></button>
       <button type="button" class="del" data-del-track="${i}" aria-label="Удалить трек ${esc(t.name)}"${tracks.length <= 1 ? ' disabled' : ''}><svg class="ico"><use href="#i-trash"/></svg></button>
     </div>`).join('');
   $('#btnAddTrack').disabled = tracks.length >= MAX_TRACKS;
   renderTabs();
+  if (view === 'grid') renderGrid();
 }
 // После добавления или удаления трека — пересобрать выбор трека в строках, сохранив выбранное
 function refreshTrackCells() {
@@ -266,6 +270,7 @@ function refresh() {
   $('#filter').value = cur;
   applyFilter();
   validate();
+  if (view === 'grid') renderGrid();
 }
 function applyFilter() {
   const f = $('#filter').value, q = $('#search').value.trim().toLowerCase();
@@ -344,6 +349,7 @@ $('#tracksEdit').addEventListener('input', e => {
   $$(`#rows [data-f="track"] option[value="${id}"]`).forEach(o => { o.textContent = tracks[i].name; });
   $$('#rows tr').forEach(tr => { if (readRow(tr).track === id) tr.style.setProperty('--c', tracks[i].color); });
   renderTabs(); setDirty(true); validate();
+  if (view === 'grid') renderGrid();
 });
 $('#btnAddTrack').addEventListener('click', () => {
   if (tracks.length >= MAX_TRACKS) return;
@@ -355,6 +361,18 @@ $('#btnAddTrack').addEventListener('click', () => {
   $$('#tracksEdit input[type=text]').at(-1).select();
 });
 $('#tracksEdit').addEventListener('click', e => {
+  // Порядок треков: так же они идут в навигации, на стойках и столбцами в таблице
+  const m = e.target.closest('[data-move-track]');
+  if (m) {
+    const i = +m.dataset.moveTrack, j = i + +m.dataset.dir;
+    if (j < 0 || j >= tracks.length) return;
+    [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
+    renderTracks(); refreshTrackCells(); setDirty(true); validate();
+    // фокус остаётся на той же кнопке у сдвинутого трека (если она стала неактивной — на соседней)
+    const same = $(`#tracksEdit [data-move-track="${j}"][data-dir="${m.dataset.dir}"]`);
+    (same && !same.disabled ? same : $(`#tracksEdit [data-move-track="${j}"][data-dir="${-m.dataset.dir}"]`))?.focus();
+    return;
+  }
   const b = e.target.closest('[data-del-track]');
   if (!b || tracks.length <= 1) return;
   const t = tracks[+b.dataset.delTrack];
@@ -376,6 +394,217 @@ $('#trackTabs').addEventListener('click', e => {
 });
 $('#filter').addEventListener('change', applyFilter);
 $('#search').addEventListener('input', applyFilter);
+
+/* ---------- Таблица: та же программа сеткой «время × треки», как в общей программе (Excel) ----------
+   Строка — интервал «начало–конец», столбец — трек. Одинаковые записи в соседних треках показываются
+   одной ячейкой на несколько столбцов, запись «для всех треков» — на всю строку.
+   Правка в таблице меняет записи списка, поэтому навигация, стойки и сайт получают её после «Сохранить».
+   Тот же расчёт на сайте — lib/schedule.php → schedule_grid(). */
+let view = 'list';
+let extraSlots = [];    // строки времени, добавленные в таблице, пока в них нет ни одной записи
+let gridItems = [], gridRefs = [];
+const sig = it => JSON.stringify([it.kind, it.title, it.speaker, it.room, it.place]);
+const byTime = (a, b) => (toMin(a.start) || 0) - (toMin(b.start) || 0) || (a.end ? toMin(a.end) : 0) - (b.end ? toMin(b.end) : 0);
+
+function buildGrid(items) {
+  const ids = tracks.map(t => t.id), slots = new Map();
+  const slot = (start, end) => {
+    const k = start + '|' + end;
+    if (!slots.has(k)) slots.set(k, { start, end, all: [], by: {} });
+    return slots.get(k);
+  };
+  items.forEach((it, i) => {
+    if (!it.start) return;
+    const s = slot(it.start, it.end);
+    if (it.track === ALL) s.all.push(i);
+    else if (ids.includes(it.track)) (s.by[it.track] ||= []).push(i);
+  });
+  extraSlots.forEach(s => slot(s.start, s.end));
+  const rows = [...slots.values()].sort(byTime);
+  const cellSig = list => list.map(i => sig(items[i])).join('\n');
+  rows.forEach(r => {
+    r.cells = [];
+    for (let c = 0; c < ids.length; c++) {
+      const list = r.by[ids[c]] || [], span = [ids[c]];
+      while (list.length && c + 1 < ids.length && cellSig(r.by[ids[c + 1]] || []) === cellSig(list)) span.push(ids[++c]);
+      r.cells.push({ tracks: span, items: list });
+    }
+  });
+  return rows;
+}
+
+const ref = o => gridRefs.push(o) - 1;
+function cardHTML(it, r) {
+  const place = placeName(it);
+  return `<button type="button" class="gcard" data-ref="${r}">
+    ${it.kind && it.kind !== 'Общее' ? `<small>${esc(it.kind)}</small>` : ''}
+    <b>${it.title ? esc(it.title) : '<i>Без названия</i>'}</b>
+    ${it.speaker ? `<span>${esc(it.speaker)}</span>` : ''}
+    ${place ? `<em>${esc(place)}</em>` : ''}
+  </button>`;
+}
+function renderGrid() {
+  gridItems = readAll().items;
+  gridRefs = [];
+  const rows = buildGrid(gridItems), ids = tracks.map(t => t.id), n = ids.length;
+  const timeTh = (r, span) => `<th scope="row" class="gtime"${span > 1 ? ` rowspan="${span}"` : ''}>
+      <button type="button" class="gtime__btn" data-ref="${ref({ kind: 'slot', start: r.start, end: r.end })}" title="Изменить время строки">
+        <b>${esc(r.start)}</b>${r.end ? `<span>до ${esc(r.end)}</span>` : ''}
+      </button></th>`;
+  const body = rows.map(r => {
+    const hasTrack = r.cells.some(c => c.items.length), showCells = hasTrack || !r.all.length;
+    let html = '';
+    if (r.all.length) {
+      html += `<tr class="grow--all">${timeTh(r, showCells ? 2 : 1)}<td colspan="${n}">
+        <div class="gcell">${r.all.map(i => cardHTML(gridItems[i], ref({ kind: 'items', idx: [i], start: r.start, end: r.end }))).join('')}
+        <div class="gacts"><button type="button" class="gact" data-ref="${ref({ kind: 'add', tracks: [ALL], start: r.start, end: r.end })}" title="Добавить ещё одну запись для всех треков">+ Для всех</button></div></div></td></tr>`;
+    }
+    if (showCells) {
+      html += `<tr>${r.all.length ? '' : timeTh(r, 1)}${r.cells.map(c => {
+        const span = c.tracks, last = ids.indexOf(span.at(-1)), next = ids[last + 1];
+        const canGrow = next && !(r.by[next] || []).length && c.items.length;
+        // k-я запись ячейки — это k-е записи всех её треков
+        const cards = c.items.map((_, k) => cardHTML(gridItems[r.by[span[0]][k]], ref({ kind: 'items', idx: span.map(t => r.by[t][k]), start: r.start, end: r.end, tracks: span })));
+        const acts = [
+          `<button type="button" class="gact" data-ref="${ref({ kind: 'add', tracks: span, start: r.start, end: r.end })}" title="${c.items.length ? 'Добавить ещё запись в эту ячейку' : 'Добавить запись'}" aria-label="Добавить запись">+</button>`,
+          span.length > 1 ? `<button type="button" class="gact" data-ref="${ref({ kind: 'shrink', start: r.start, end: r.end, tracks: span, by: r.by })}" title="Убрать из трека «${esc(tracks.find(t => t.id === span.at(-1)).name)}»" aria-label="Сузить ячейку">←</button>` : '',
+          canGrow ? `<button type="button" class="gact" data-ref="${ref({ kind: 'grow', next, start: r.start, end: r.end, tracks: span, by: r.by })}" title="Растянуть на трек «${esc(tracks.find(t => t.id === next).name)}»" aria-label="Растянуть ячейку вправо">→</button>` : '',
+        ].join('');
+        const t0 = tracks.find(t => t.id === span[0]);
+        return `<td${span.length > 1 ? ` colspan="${span.length}"` : ''} class="${c.items.length ? '' : 'is-empty'}" style="--c:${esc(t0.color)}"><div class="gcell">${cards.join('')}<div class="gacts">${acts}</div></div></td>`;
+      }).join('')}</tr>`;
+    }
+    return html;
+  }).join('');
+  $('#grid').style.setProperty('--n', n);
+  $('#grid').innerHTML = `<thead><tr><th class="gtime">Время</th>${tracks.map(t => `<th style="--c:${esc(t.color)}">${esc(t.name)}</th>`).join('')}</tr></thead>
+    <tbody>${body || `<tr><td class="gempty" colspan="${n + 1}">Пока ни одной записи. Нажмите «+ Добавить время».</td></tr>`}</tbody>`;
+  const orphans = gridItems.filter(it => it.start && it.track !== ALL && !ids.includes(it.track)).length;
+  const noTime = gridItems.filter(it => !it.start).length;
+  $('#gridNote').hidden = !(orphans || noTime);
+  $('#gridNote').textContent = [noTime && `Без времени начала: ${noTime} — в таблице не показаны, заполните их во вкладке «Список».`, orphans && `Записи без трека: ${orphans}.`].filter(Boolean).join(' ');
+}
+function commitItems(items) {
+  $('#rows').innerHTML = items.map(rowHTML).join('');
+  setDirty(true); refresh();
+}
+
+/* Окно правки: запись (или одинаковые записи нескольких треков), новая запись, строка времени */
+let dlg = null;
+function openDialog(o) {
+  dlg = o;
+  const isSlot = o.kind === 'slot' || o.kind === 'newslot';
+  const it = o.kind === 'items' ? gridItems[o.idx[0]] : { start: o.start || '', end: o.end || '', kind: 'Лекция', title: '', speaker: '', room: '', place: '', track: o.tracks?.[0] };
+  const names = (o.tracks || []).filter(t => t !== ALL).map(id => tracks.find(t => t.id === id)?.name).filter(Boolean);
+  $('#gTitle').textContent = { items: 'Запись программы', add: 'Новая запись', slot: 'Время строки', newslot: 'Новая строка времени' }[o.kind];
+  const times = `<div class="gf-row">
+      <label class="gf">Начало<input type="time" data-f="start" value="${esc(it.start)}" required></label>
+      <label class="gf">Конец<input type="time" data-f="end" value="${esc(it.end)}"></label>
+    </div>`;
+  if (isSlot) {
+    const count = o.kind === 'slot' ? gridItems.filter(x => x.start === o.start && x.end === o.end).length : 0;
+    $('#gFields').innerHTML = times + (o.kind === 'slot' ? `<p class="gf-note">Новое время получат все записи этой строки (${count}).</p>` : '');
+  } else {
+    const all = (it.track || '') === ALL || (o.tracks || [])[0] === ALL;
+    $('#gFields').innerHTML = times + `
+      ${names.length > 1 ? `<p class="gf-note">Ячейка объединяет треки: ${esc(names.join(', '))}. Правка применится ко всем.</p>` : names.length ? `<p class="gf-note">Трек: ${esc(names[0])}</p>` : ''}
+      <label class="gf">Формат<select data-f="kind">${KINDS.map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
+      <label class="gf">Название<input data-f="title" value="${esc(it.title)}" required placeholder="Название лекции"></label>
+      <label class="gf">Спикер<input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></label>
+      <div class="gf">Место${placeSelect(it)}</div>
+      <label class="gf-check"><input type="checkbox" data-f="all"${all ? ' checked' : ''}> Для всех треков — на всю строку (открытие, обед, нетворкинг)</label>`;
+  }
+  $('#gDel').hidden = o.kind !== 'items' && o.kind !== 'slot';
+  $('#gDel').textContent = o.kind === 'slot' ? 'Удалить строку' : 'Удалить';
+  $('#gdlg').showModal();
+  $('#gFields').querySelector(isSlot ? '[data-f="start"]' : '[data-f="title"]')?.focus();
+}
+$('#gFields').addEventListener('change', e => {
+  if (e.target.dataset.f !== 'room') return;
+  const other = e.target.parentElement.querySelector('.other');
+  other.hidden = e.target.value !== OTHER;
+  if (!other.hidden) other.focus();
+});
+const dv = f => $('#gFields').querySelector(`[data-f="${f}"]`);
+$('#gform').addEventListener('submit', e => {
+  if (e.submitter?.value !== 'ok' || !dlg) return;
+  const items = gridItems.map(x => ({ ...x })), start = dv('start').value, end = dv('end').value;
+  const o = dlg;
+  if (o.kind === 'slot' || o.kind === 'newslot') {
+    if (o.kind === 'slot') {
+      items.forEach(x => { if (x.start === o.start && x.end === o.end) { x.start = start; x.end = end; } });
+      extraSlots = extraSlots.filter(s => !(s.start === o.start && s.end === o.end));
+      if (!items.some(x => x.start === start && x.end === end)) extraSlots.push({ start, end });
+    } else if (!extraSlots.some(s => s.start === start && s.end === end)) extraSlots.push({ start, end });
+    commitItems(items);
+    return;
+  }
+  const room = dv('room').value;
+  const patch = {
+    start, end, kind: dv('kind').value, title: dv('title').value.trim(), speaker: dv('speaker').value.trim(),
+    room: room === OTHER ? '' : room, place: room === OTHER ? dv('place').value.trim() : '',
+  };
+  const all = dv('all').checked;
+  if (o.kind === 'add') {
+    // «+ Для всех» со снятой галочкой — запись уходит в первый трек
+    const list = all ? [ALL] : o.tracks[0] === ALL ? [tracks[0].id] : o.tracks;
+    list.forEach(track => items.push({ ...patch, track }));
+  } else {
+    const wasAll = items[o.idx[0]].track === ALL;
+    o.idx.forEach(i => Object.assign(items[i], patch));
+    if (all) {
+      items[o.idx[0]].track = ALL;
+      o.idx.slice(1).forEach(i => { items[i] = null; });
+    } else if (wasAll) items[o.idx[0]].track = tracks[0].id;
+  }
+  extraSlots = extraSlots.filter(s => !(s.start === start && s.end === end));
+  commitItems(items.filter(Boolean));
+});
+$('#gDel').addEventListener('click', () => {
+  const o = dlg;
+  if (!o) return;
+  if (o.kind === 'slot') {
+    const n = gridItems.filter(x => x.start === o.start && x.end === o.end).length;
+    if (n && !confirm(`Удалить строку ${o.start}${o.end ? '–' + o.end : ''} вместе с записями (${n})?`)) return;
+    extraSlots = extraSlots.filter(s => !(s.start === o.start && s.end === o.end));
+    $('#gdlg').close();
+    commitItems(gridItems.filter(x => !(x.start === o.start && x.end === o.end)));
+    return;
+  }
+  const it = gridItems[o.idx[0]];
+  if (!confirm(`Удалить «${it.title || 'без названия'}»${o.idx.length > 1 ? ` из всех треков ячейки (${o.idx.length})` : ''}?`)) return;
+  $('#gdlg').close();
+  commitItems(gridItems.filter((_, i) => !o.idx.includes(i)));
+});
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('[data-ref]');
+  if (!b) return;
+  const o = gridRefs[+b.dataset.ref];
+  if (o.kind === 'grow') {
+    // копии записей первого трека ячейки — в следующий трек
+    const items = gridItems.map(x => ({ ...x }));
+    (o.by[o.tracks[0]] || []).forEach(i => items.push({ ...gridItems[i], track: o.next }));
+    commitItems(items);
+    return;
+  }
+  if (o.kind === 'shrink') {
+    const drop = o.by[o.tracks.at(-1)] || [];
+    commitItems(gridItems.filter((_, i) => !drop.includes(i)));
+    return;
+  }
+  openDialog(o);
+});
+$('#btnAddSlot').addEventListener('click', () => {
+  const last = buildGrid(readAll().items).at(-1);
+  openDialog({ kind: 'newslot', start: last?.end || '', end: '' });
+});
+$$('.vtab').forEach(b => b.addEventListener('click', () => {
+  view = b.dataset.view;
+  $$('.vtab').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  $$('[data-for="list"]').forEach(el => { el.hidden = view !== 'list'; });
+  $$('[data-for="grid"]').forEach(el => { el.hidden = view !== 'grid'; });
+  if (view === 'grid') renderGrid(); else applyFilter();
+}));
 
 /* ---------- Помещения ---------- */
 let roomFloor = FLOOR_IDS.find(f => !FLOORS[f].placeholder) || 1, roomSel = null;   // первый этаж с готовым планом

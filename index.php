@@ -1,5 +1,6 @@
 <?php
 require __DIR__ . '/lib/content.php';
+require_once __DIR__ . '/lib/schedule.php';
 $content = load_content();
 
 // Префикс относительных путей к файлам (пустой: страница лежит в корне сайта)
@@ -219,6 +220,72 @@ function reg_button(string $class, string $label, bool $arrow = true): string
     </div>
   </div>
 </section>
+
+<?php
+// Общая программа сеткой «время × треки» — из админки «Навигация и программа»
+$sched = load_schedule();
+$sgrid = schedule_grid($sched);
+if ($sgrid):
+    $sTracks = array_column($sched['tracks'], null, 'id');
+    $sRooms = schedule_room_names($sched);
+    $sItem = function (array $it) use ($sRooms): string {
+        $place = $it['room'] !== '' ? ($sRooms[$it['room']] ?? '') : $it['place'];
+        return '<div class="sgrid__item">'
+            . ($it['kind'] !== '' && $it['kind'] !== 'Общее' ? '<small>' . e($it['kind']) . '</small>' : '')
+            . '<b>' . e($it['title']) . '</b>'
+            . ($it['speaker'] !== '' && $it['speaker'] !== '?' ? '<span>' . e($it['speaker']) . '</span>' : '')
+            . ($place !== '' ? '<em><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>' . e($place) . '</em>' : '')
+            . '</div>';
+    };
+?>
+<!-- ============ ОБЩАЯ ПРОГРАММА ПО ТРЕКАМ ============ -->
+<section class="section sgrid" id="schedule">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num"><?= $num() ?></span>
+      <h2 class="h2">Программа <em>по трекам</em></h2>
+    </div>
+    <div class="sgrid__wrap reveal" tabindex="0" role="region" aria-label="Программа по трекам">
+      <table class="sgrid__table" style="--n:<?= count($sTracks) ?>">
+        <thead>
+          <tr>
+            <th scope="col" class="sgrid__time">Время</th>
+<?php foreach ($sTracks as $t): ?>
+            <th scope="col" style="--c:<?= e($t['color']) ?>"><?= e($t['name']) ?></th>
+<?php endforeach; ?>
+          </tr>
+        </thead>
+        <tbody>
+<?php foreach ($sgrid as $row):
+    $time = '<time>' . e($row['start']) . '</time>' . ($row['end'] !== '' ? '<time>' . e($row['end']) . '</time>' : '');
+    $both = $row['all'] && $row['cells'];
+?>
+<?php if ($row['all']): ?>
+          <tr class="sgrid__row--all">
+            <th scope="row" class="sgrid__time"<?= $both ? ' rowspan="2"' : '' ?>><?= $time ?></th>
+            <td colspan="<?= count($sTracks) ?>" data-label="Для всех"><?= implode('', array_map($sItem, $row['all'])) ?></td>
+          </tr>
+<?php endif; ?>
+<?php if ($row['cells']): ?>
+          <tr>
+<?php if (!$both): ?>
+            <th scope="row" class="sgrid__time"><?= $time ?></th>
+<?php endif; ?>
+<?php foreach ($row['cells'] as $cell):
+    $first = $sTracks[$cell['tracks'][0]];
+    $label = implode(' · ', array_map(fn($id) => $sTracks[$id]['name'], $cell['tracks']));
+?>
+            <td<?= count($cell['tracks']) > 1 ? ' colspan="' . count($cell['tracks']) . '"' : '' ?><?= $cell['items'] ? ' style="--c:' . e($first['color']) . '" data-label="' . e($label) . '"' : ' class="is-empty"' ?>><?= implode('', array_map($sItem, $cell['items'])) ?></td>
+<?php endforeach; ?>
+          </tr>
+<?php endif; ?>
+<?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
 
 <!-- ============ 03. ПАРТНЁРЫ ============ -->
 <section class="section partners" id="partners">
