@@ -1,0 +1,7 @@
+# Страницы навигации не кэшируются: после выкладки телефоны и стойки сразу получают новые ссылки на ?v=… файлы.
+# При изменении assets/*.css, *.js или data/rooms.js — поменяйте ?v= в index.html и stand.html.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
