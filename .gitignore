@@ -13,3 +13,6 @@ config.local.php
 .ftp-deploy-sync-state.json
 .DS_Store
 Thumbs.db
+
+# Рабочие таблицы (общая программа с контактами) — только локально
+*.xlsx

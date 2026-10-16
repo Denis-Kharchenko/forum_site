@@ -1,7 +1,9 @@
 /* Админка сайта → «Навигация и подробная программа». Перенесено из admin.html проекта навигации:
    программа хранится на сервере (data/schedule.json), сохраняется запросом к navigation.php. */
 const SAVE_URL = 'navigation.php';
-const KINDS = ['Лекция', 'Кейс-лекция', 'Мастер-класс', 'Тренинг', 'Воркшоп', 'Пленарная сессия', 'Дискуссия', 'Общее'];
+const KINDS = ['Лекция', 'Кейс-лекция', 'Интерактивная лекция', 'Интервью-лекция', 'Стендап-лекция', 'Мастер-класс', 'Тренинг', 'Практический тренинг', 'Инсайд-тренинг', 'Воркшоп', 'Кейс-сессия', 'Пленарная сессия', 'Пленарная сессия-интервью', 'Дискуссия', 'Открытые диалоги', 'Презентация практик', 'Визуалити', 'Нетворкинг', 'Экскурсия', 'Общее'];
+// Формат записи, которого нет в списке (например, перенесён из Excel), тоже остаётся в выборе
+const kindsFor = k => !k || KINDS.includes(k) ? KINDS : [...KINDS, k];
 const OTHER = '__other';
 const ALL = 'all';
 const DEFAULT_TRACKS = [
@@ -155,7 +157,7 @@ function rowHTML(it = {}) {
     <td><input type="time" data-f="start" value="${esc(it.start)}" required></td>
     <td><input type="time" data-f="end" value="${esc(it.end)}"></td>
     <td>${trackCell(it)}</td>
-    <td><select data-f="kind">${KINDS.map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></td>
+    <td><select data-f="kind">${kindsFor(it.kind).map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></td>
     <td><input data-f="title" value="${esc(it.title)}" placeholder="Название лекции" required></td>
     <td><input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></td>
     <td>${placeSelect(it)}</td>
@@ -508,7 +510,7 @@ function openDialog(o) {
     const all = (it.track || '') === ALL || (o.tracks || [])[0] === ALL;
     $('#gFields').innerHTML = times + `
       ${names.length > 1 ? `<p class="gf-note">Ячейка объединяет треки: ${esc(names.join(', '))}. Правка применится ко всем.</p>` : names.length ? `<p class="gf-note">Трек: ${esc(names[0])}</p>` : ''}
-      <label class="gf">Формат<select data-f="kind">${KINDS.map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
+      <label class="gf">Формат<select data-f="kind">${kindsFor(it.kind).map(k => `<option${(it.kind || 'Лекция') === k ? ' selected' : ''}>${k}</option>`).join('')}</select></label>
       <label class="gf">Название<input data-f="title" value="${esc(it.title)}" required placeholder="Название лекции"></label>
       <label class="gf">Спикер<input data-f="speaker" value="${esc(it.speaker)}" placeholder="Имя, должность"></label>
       <div class="gf">Место${placeSelect(it)}</div>

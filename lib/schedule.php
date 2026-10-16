@@ -12,8 +12,29 @@ const SCHEDULE_DEFAULT = __DIR__ . '/schedule.default.json';
 const MAX_TRACKS       = 8;     // больше не помещается в шапку программы на стойке
 const MAX_ITEMS        = 400;
 
+// Разовый перенос программы из файла (lib/schedule.import.json, например из Excel общей программы).
+// Применяется один раз на сервере: прежняя программа уходит в data/backups, правки помещений сохраняются.
+// Чтобы перенести новую версию, положите файл с другим import_id.
+const SCHEDULE_IMPORT = __DIR__ . '/schedule.import.json';
+
+function apply_schedule_import(): void
+{
+    if (!is_file(SCHEDULE_IMPORT)) return;
+    $imp = json_decode((string)file_get_contents(SCHEDULE_IMPORT), true);
+    $id = is_array($imp) ? id_field($imp['import_id'] ?? '', 60) : '';
+    if ($id === '') return;
+    $mark = DATA_DIR . '/schedule-import-' . $id . '.done';
+    if (is_file($mark)) return;
+    ensure_data_dirs();
+    if (@file_put_contents($mark, gmdate('c'), LOCK_EX) === false) return;
+    $cur = json_decode((string)file_get_contents(is_file(SCHEDULE_FILE) ? SCHEDULE_FILE : SCHEDULE_DEFAULT), true);
+    $imp['rooms'] = is_array($cur) ? ($cur['rooms'] ?? []) : [];
+    save_schedule($imp);
+}
+
 function load_schedule(): array
 {
+    apply_schedule_import();
     $file = is_file(SCHEDULE_FILE) ? SCHEDULE_FILE : SCHEDULE_DEFAULT;
     $data = json_decode((string)file_get_contents($file), true);
     if (!is_array($data)) {
