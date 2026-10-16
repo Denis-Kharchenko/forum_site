@@ -68,7 +68,7 @@ function showView(name) {
   $$('.view').forEach(v => v.classList.toggle('is-active', v.id === VIEWS[name]));
   if (history.replaceState) history.replaceState(null, '', '#' + name);
   if (name === 'nav') requestAnimationFrame(() => plan.fit(false));
-  if (name === 'program') { prog.page = -1; requestAnimationFrame(() => { renderProgram(); if (prog.track === GRID) scrollGridToNow(); }); }
+  if (name === 'program') { prog.page = -1; requestAnimationFrame(() => { renderProgram(); scrollGridToNow(); }); }
 }
 $$('.tab').forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
 
@@ -434,7 +434,7 @@ function setTrack(id) {
   $$('#progChips .chip').forEach(x => x.setAttribute('aria-selected', String(x.dataset.track === id)));
   setTimelineColor(id);
   renderProgram();
-  if (id === GRID) scrollGridToNow();
+  scrollGridToNow();
 }
 $$('#progChips .chip').forEach(ch => ch.addEventListener('click', () => setTrack(ch.dataset.track)));
 function setTimelineColor(id) {
@@ -514,48 +514,26 @@ function renderGrid() {
   $('#pgridTable').innerHTML = `<thead><tr><th class="pg-time">Время</th>${TRACKS.map(t => `<th style="--c:${esc(t.color)}">${esc(t.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
   $('#progEmpty').hidden = rows.length > 0;
 }
-// Прокрутить к текущей (или ближайшей) строке — только при открытии, не при ежеминутном обновлении
+// Прокрутить к текущей (или ближайшей) лекции — только при открытии, не при ежеминутном обновлении
 function scrollGridToNow() {
-  const wrap = $('#pgrid'), row = wrap.querySelector('tbody tr.is-now') || wrap.querySelector('tbody tr:not(.is-past)');
+  const grid = prog.track === GRID, wrap = grid ? $('#pgrid') : $('#timeline');
+  const sel = grid ? 'tbody tr' : '.slot';
+  const row = wrap.querySelector(sel + '.is-now') || wrap.querySelector(sel + ':not(.is-past)');
   wrap.scrollTop = 0;
-  if (row && nowState().today) wrap.scrollTop = row.offsetTop - wrap.querySelector('thead').offsetHeight;
+  if (row && nowState().today) wrap.scrollTop = row.getBoundingClientRect().top - wrap.getBoundingClientRect().top - (grid ? wrap.querySelector('thead').offsetHeight : 0);
 }
 
-const MAX_ROW = 84;   // телефон: высота строки, если лекций мало
+// Трек — весь список лекций целиком: текст переносится, лишнее прокручивается (без страниц)
 function renderProgram() {
   const grid = prog.track === GRID;
   $('#pgrid').hidden = !grid;
   $('#timeline').hidden = grid;
-  if (grid) { $('#pager').hidden = true; renderGrid(); return; }
+  $('#pager').hidden = true;
+  if (grid) { renderGrid(); return; }
   const list = $('#timeline'), st = nowState();
   const items = ITEMS.filter(it => trackOf(it) === ALL || trackOf(it) === prog.track);
   $('#progEmpty').hidden = items.length > 0;
-  // Сколько строк помещается без прокрутки — меряем по одной отрисованной строке
-  // На телефоне — все лекции трека на одном экране: строки делят высоту поровну
-  const fitAll = matchMedia('(max-width: 600px)').matches;
-  list.style.gridTemplateRows = fitAll && items.length ? `repeat(${items.length}, minmax(0, ${MAX_ROW}px))` : '';
-  if (fitAll) {
-    prog.perPage = Math.max(1, items.length);
-    const rowH = Math.min(MAX_ROW, list.clientHeight / Math.max(1, items.length));
-    list.classList.toggle('is-dense', rowH < 58);
-    list.classList.toggle('is-tiny', rowH < 40);
-  } else if (items.length) {
-    list.classList.remove('is-dense', 'is-tiny');
-    list.innerHTML = slotHTML(items[0], st);
-    const rowH = list.firstElementChild.offsetHeight || 64;
-    prog.perPage = Math.max(1, Math.floor((list.clientHeight - 2) / rowH));
-  } else prog.perPage = 1;
-  const pages = Math.max(1, Math.ceil(items.length / prog.perPage));
-  if (prog.page < 0) {   // по умолчанию — страница с текущей или ближайшей лекцией
-    const i = st.today ? items.findIndex(it => !isPast(it, st)) : 0;
-    prog.page = Math.floor(Math.max(0, i) / prog.perPage);
-  }
-  prog.page = Math.min(prog.page, pages - 1);
-  list.innerHTML = items.slice(prog.page * prog.perPage, (prog.page + 1) * prog.perPage).map(it => slotHTML(it, st)).join('');
-  $('#pager').hidden = pages < 2;
-  $('#pgInfo').textContent = `${prog.page + 1} / ${pages}`;
-  $('#pgPrev').disabled = prog.page === 0;
-  $('#pgNext').disabled = prog.page >= pages - 1;
+  list.innerHTML = items.map(it => slotHTML(it, st)).join('');
 }
 $('#pgPrev').addEventListener('click', () => { prog.page--; renderProgram(); });
 $('#pgNext').addEventListener('click', () => { prog.page++; renderProgram(); });
