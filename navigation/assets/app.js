@@ -461,7 +461,7 @@ function slotHTML(it, st) {
 
 /* Таблица всех треков: строка — интервал, столбец — трек. Одинаковые записи в соседних треках —
    одна ячейка на несколько столбцов, запись «для всех треков» — на всю строку.
-   Тот же расчёт, что в админке (admin/navigation.js → buildGrid) и на главной (lib/schedule.php). */
+   Тот же расчёт, что в админке (admin/navigation.js → buildGrid). */
 function gridRows() {
   const ids = TRACKS.map(t => t.id), slots = new Map();
   ITEMS.forEach(it => {
