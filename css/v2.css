@@ -87,18 +87,16 @@ body.v2 .hero {
 /* Шапка: подчёркивание активного пункта меню — красное */
 .v2 .nav a::after { background: var(--red); }
 
-/* Шапка: «Программа» выделена постоянно — красный текст и красная черта */
-.v2 .nav .nav__program { color: var(--red); font-weight: 600; }
-.v2 .nav .nav__program::after { transform: scaleX(1); }
-.v2 .nav .nav__program:hover { color: var(--red-deep); }
-/* Кнопка «Навигация по форуму» — синяя, рядом с регистрацией; в мобильном меню — отдельный пункт */
+/* Кнопки «Программа» (красная, ведёт в навигацию на вкладку программы) и «Навигация по форуму» (синяя)
+   рядом с регистрацией; в мобильном меню — отдельные пункты */
 .header__navi { gap: 8px; padding-inline: 18px; }
 .header__navi .ico { width: 20px; height: 20px; }
 .btn.header__navi:hover .ico { transform: translateY(-2px); }
-.nav__navi { display: none; }
+.nav__prog, .nav__navi { display: none; }
 .v2 .nav a { white-space: nowrap; }
-/* Средние экраны: без подписи у логотипа, иначе пункты меню и две кнопки не помещаются в строку */
-@media (max-width: 1440px) and (min-width: 1281px) {
+/* Шапка в одну строку (шире 1280px): без подписи у логотипа, иначе пункты меню и три кнопки не помещаются.
+   Шире 1440px сайт масштабируется целиком, поэтому места больше не становится */
+@media (min-width: 1281px) {
   .v2 .header .logo__text { display: none; }
   .v2 .header__inner { gap: 24px; }
 }
@@ -114,10 +112,12 @@ body.v2 .hero {
   background: linear-gradient(to bottom right, transparent calc(50% - 2px), var(--blue) calc(50% - 2px) 50%, transparent 50%);
 }
 
-/* Мобильное меню (синее): «Программа» — белая с красной чертой слева, «Навигация» — пункт в белой рамке над регистрацией */
+/* Мобильное меню (синее): «Программа» — красная плашка, «Навигация» — пункт в белой рамке, ниже регистрация */
 @media (max-width: 1280px) {
-  .v2 .nav .nav__program, .v2 .nav .nav__program:hover { color: #fff; opacity: 1; box-shadow: inset 6px 0 0 var(--red); padding-left: 18px; }
+  .v2 .nav .nav__prog { display: block; margin-top: 16px; padding: 14px 0; border: 0; background: var(--red); color: #fff; text-align: center; }
+  .v2 .nav .nav__prog:hover { background: var(--red-deep); opacity: 1; }
   .v2 .nav .nav__navi { display: block; margin-top: 16px; padding: 12px 0; border: 2px solid #fff; text-align: center; }
+  .v2 .nav .nav__prog + .nav__navi { margin-top: 10px; }
   .v2 .nav .nav__navi + .nav__reg { margin-top: 10px; }
 }
 

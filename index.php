@@ -100,7 +100,6 @@ function reg_button(string $class, string $label, bool $arrow = true): string
       <a href="#live" class="nav__live">Эфир</a>
 <?php endif; ?>
       <a href="#about">О форуме</a>
-      <a href="#program" class="nav__program">Программа</a>
       <a href="#partners">Партнёры</a>
       <a href="#speakers">Спикеры</a>
       <a href="#place">Место</a>
@@ -108,9 +107,11 @@ function reg_button(string $class, string $label, bool $arrow = true): string
       <a href="#gallery">Фото</a>
 <?php endif; ?>
       <a href="#contacts">Контакты</a>
+      <a href="navigation/#program" class="nav__prog">Программа</a>
       <a href="navigation/" class="nav__navi">Навигация по форуму</a>
       <?= reg_button('nav__reg', 'Регистрация', false) ?>
     </nav>
+    <a href="navigation/#program" class="btn btn--red header__cta header__navi"><svg class="ico" aria-hidden="true"><use href="#i-cal"/></svg>Программа</a>
     <a href="navigation/" class="btn btn--blue header__cta header__navi"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Навигация по форуму</a>
     <?= reg_button('btn btn--blue header__cta', 'Регистрация', false) ?>
     <button class="burger" id="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
