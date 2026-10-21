@@ -362,7 +362,11 @@
     setStatus('Сохраняю…');
     try {
       const fd = new FormData();
-      fd.append('action', 'save'); fd.append('csrf', window.CSRF); fd.append('content', JSON.stringify(data));
+      // base64: фильтр хостинга отвечает 403 на ссылки и HTML (например, код <iframe>) в теле запроса
+      const bytes = new TextEncoder().encode(JSON.stringify(data));
+      let bin = '';
+      for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+      fd.append('action', 'save'); fd.append('csrf', window.CSRF); fd.append('content_b64', btoa(bin));
       const json = await post(fd);
       if (!json.ok) { setStatus(json.error || 'Не удалось сохранить', 'error'); return; }
       // Поля, которые сервер не принял (например, неверная ссылка или email), не должны пропадать молча

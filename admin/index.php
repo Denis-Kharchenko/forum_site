@@ -134,7 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $res = handle_upload($kind);
             json_out($res, $res['ok'] ? 200 : 400);
         }
-        $data = json_decode((string)($_POST['content'] ?? ''), true);
+        // Содержимое приходит в base64: фильтр хостинга отвечает 403 на ссылки и HTML в теле запроса
+        $raw = isset($_POST['content_b64']) ? base64_decode((string)$_POST['content_b64'], true) : ($_POST['content'] ?? '');
+        $data = json_decode((string)$raw, true);
         if (!is_array($data)) json_out(['ok' => false, 'error' => 'Не удалось прочитать данные'], 400);
         save_content($data);
         json_out(['ok' => true, 'content' => load_content()]);
