@@ -21,6 +21,27 @@
   const setStatus = (text, type = '') => { statusEl.textContent = text; statusEl.dataset.type = type; };
   const markDirty = () => { dirty = true; setStatus('Есть несохранённые изменения', 'warn'); };
 
+  /* ---------- Запрос к серверу ----------
+     Защита хостинга от ботов иногда отвечает вместо админки страницей-переадресацией (…?attempt=1),
+     которая ставит cookie. Проходим её тем же GET-запросом и повторяем отправку один раз.
+     Если ответ всё равно не JSON — показываем код и начало ответа, а не безликую «Ошибку сервера». */
+  const post = async (fd, retry = true) => {
+    let res;
+    try { res = await fetch('./', { method: 'POST', body: fd, credentials: 'same-origin', cache: 'no-store' }); }
+    catch { return { ok: false, error: 'Не удалось связаться с сайтом. Проверьте интернет и попробуйте ещё раз — правки не пропали' }; }
+    const text = await res.text();
+    try { return JSON.parse(text); } catch {}
+    const refresh = text.match(/http-equiv=["']?refresh["']?[^>]*url=([^"'>\s]+)/i);
+    if (refresh && retry) {
+      await fetch(refresh[1].replace(/&amp;/g, '&'), { credentials: 'same-origin', cache: 'no-store' }).catch(() => {});
+      return post(fd, false);
+    }
+    if (refresh) return { ok: false, error: 'Защита хостинга от ботов не пропустила сохранение. Правки не пропали: откройте сайт в соседней вкладке, вернитесь сюда и нажмите «Сохранить» ещё раз' };
+    const snippet = text.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160);
+    console.error('Ответ сервера', res.status, text);
+    return { ok: false, error: `Ошибка сервера (код ${res.status})${snippet ? ': ' + snippet : ''}. Правки не пропали — не закрывайте страницу и попробуйте ещё раз` };
+  };
+
   const input = (obj, key, label, opts = {}) => h('label', { class: 'field' + (opts.wide ? ' field--wide' : '') },
     h('span', {}, label),
     h('input', {
@@ -64,8 +85,7 @@
     const fd = new FormData();
     fd.append('action', 'upload'); fd.append('kind', kind); fd.append('csrf', window.CSRF); fd.append('file', file);
     setStatus('Загружаю картинку…');
-    const res = await fetch('./', { method: 'POST', body: fd, credentials: 'same-origin' });
-    const json = await res.json().catch(() => ({ ok: false, error: 'Ошибка сервера' }));
+    const json = await post(fd);
     if (!json.ok) { setStatus(json.error || 'Не удалось загрузить', 'error'); return null; }
     setStatus('Картинка загружена — не забудьте сохранить', 'warn');
     return json.path;
@@ -343,8 +363,7 @@
     try {
       const fd = new FormData();
       fd.append('action', 'save'); fd.append('csrf', window.CSRF); fd.append('content', JSON.stringify(data));
-      const res = await fetch('./', { method: 'POST', body: fd, credentials: 'same-origin' });
-      const json = await res.json().catch(() => ({ ok: false, error: 'Ошибка сервера' }));
+      const json = await post(fd);
       if (!json.ok) { setStatus(json.error || 'Не удалось сохранить', 'error'); return; }
       // Поля, которые сервер не принял (например, неверная ссылка или email), не должны пропадать молча
       const rejected = [
