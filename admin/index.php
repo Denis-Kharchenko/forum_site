@@ -10,12 +10,23 @@ const MAX_UPLOAD    = 5 * 1024 * 1024;
 
 function handle_upload(string $kind): array
 {
-    $f = $_FILES['file'] ?? null;
-    if (!$f || !is_array($f) || $f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
-        return ['ok' => false, 'error' => 'Файл не загрузился. Попробуйте ещё раз'];
-    }
-    if ($f['size'] > MAX_UPLOAD) {
-        return ['ok' => false, 'error' => 'Файл больше 5 МБ'];
+    // Файл приходит в base64 обычным полем формы: хостинг отвечает 403 на запросы multipart/form-data
+    if (isset($_POST['file_b64'])) {
+        $bin = base64_decode((string)$_POST['file_b64'], true);
+        if ($bin === false || $bin === '') return ['ok' => false, 'error' => 'Файл не загрузился. Попробуйте ещё раз'];
+        if (strlen($bin) > MAX_UPLOAD) return ['ok' => false, 'error' => 'Файл больше 5 МБ'];
+        $tmp = tempnam(sys_get_temp_dir(), 'up');
+        file_put_contents($tmp, $bin);
+        register_shutdown_function(fn() => @unlink($tmp));
+        $f = ['name' => (string)($_POST['file_name'] ?? ''), 'tmp_name' => $tmp];
+    } else {
+        $f = $_FILES['file'] ?? null;
+        if (!$f || !is_array($f) || $f['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) {
+            return ['ok' => false, 'error' => 'Файл не загрузился. Попробуйте ещё раз'];
+        }
+        if ($f['size'] > MAX_UPLOAD) {
+            return ['ok' => false, 'error' => 'Файл больше 5 МБ'];
+        }
     }
     $ext = strtolower(pathinfo((string)$f['name'], PATHINFO_EXTENSION));
     $ext = $ext === 'jpeg' ? 'jpg' : $ext;
@@ -48,7 +59,7 @@ function handle_upload(string $kind): array
 
     $max = ['speaker' => 900, 'partner' => 700, 'gallery' => 1800][$kind];
     if (!resize_image($f['tmp_name'], $dest, $ext, $info[0], $info[1], $max)) {
-        move_uploaded_file($f['tmp_name'], $dest);
+        copy($f['tmp_name'], $dest);
     }
     return ['ok' => true, 'path' => 'data/uploads/' . $name];
 }

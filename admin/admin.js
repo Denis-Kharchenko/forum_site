@@ -25,6 +25,13 @@
      Защита хостинга от ботов иногда отвечает вместо админки страницей-переадресацией (…?attempt=1),
      которая ставит cookie. Проходим её тем же GET-запросом и повторяем отправку один раз.
      Если ответ всё равно не JSON — показываем код и начало ответа, а не безликую «Ошибку сервера». */
+  // Хостинг отвечает 403 на любые запросы multipart/form-data (FormData), поэтому всё уходит обычной формой
+  // (URLSearchParams), а содержимое и файлы — в base64: фильтр не реагирует на ссылки и HTML внутри
+  const b64 = bytes => {
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  };
   const post = async (fd, retry = true) => {
     let res;
     try { res = await fetch('./', { method: 'POST', body: fd, credentials: 'same-origin', cache: 'no-store' }); }
@@ -82,8 +89,9 @@
       } }, '✕'));
 
   const upload = async (file, kind) => {
-    const fd = new FormData();
-    fd.append('action', 'upload'); fd.append('kind', kind); fd.append('csrf', window.CSRF); fd.append('file', file);
+    if (file.size > 5 * 1024 * 1024) { setStatus('Файл больше 5 МБ', 'error'); return null; }
+    const fd = new URLSearchParams({ action: 'upload', kind, csrf: window.CSRF, file_name: file.name,
+      file_b64: b64(new Uint8Array(await file.arrayBuffer())) });
     setStatus('Загружаю картинку…');
     const json = await post(fd);
     if (!json.ok) { setStatus(json.error || 'Не удалось загрузить', 'error'); return null; }
@@ -361,12 +369,8 @@
     saveBtn.disabled = true;
     setStatus('Сохраняю…');
     try {
-      const fd = new FormData();
-      // base64: фильтр хостинга отвечает 403 на ссылки и HTML (например, код <iframe>) в теле запроса
-      const bytes = new TextEncoder().encode(JSON.stringify(data));
-      let bin = '';
-      for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-      fd.append('action', 'save'); fd.append('csrf', window.CSRF); fd.append('content_b64', btoa(bin));
+      const fd = new URLSearchParams({ action: 'save', csrf: window.CSRF,
+        content_b64: b64(new TextEncoder().encode(JSON.stringify(data))) });
       const json = await post(fd);
       if (!json.ok) { setStatus(json.error || 'Не удалось сохранить', 'error'); return; }
       // Поля, которые сервер не принял (например, неверная ссылка или email), не должны пропадать молча

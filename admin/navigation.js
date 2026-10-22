@@ -102,8 +102,8 @@ ${items}
 
 /* ---------- Запросы к серверу ---------- */
 async function api(body) {
-  const fd = new FormData();
-  Object.entries(body).forEach(([k, v]) => fd.append(k, v));
+  // Обычная форма, не FormData: хостинг отвечает 403 на любые запросы multipart/form-data
+  const fd = new URLSearchParams(body);
   let res;
   try {
     res = await fetch(SAVE_URL, { method: 'POST', body: fd, headers: { 'X-CSRF-Token': window.CSRF }, credentials: 'same-origin', cache: 'no-store' });
