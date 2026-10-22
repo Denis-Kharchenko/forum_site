@@ -9,7 +9,7 @@
 <!-- Версия для сайта и телефонов. Разметка совпадает со stand.html (стойкой); логика и стили общие: assets/app.js, assets/app.css -->
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/plan.css?v=20261016b">
-<link rel="stylesheet" href="assets/app.css?v=20261016b">
+<link rel="stylesheet" href="assets/app.css?v=20261023">
 </head>
 <body class="is-web">
 
@@ -17,6 +17,7 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-map" viewBox="0 0 24 24"><path d="M14.1 5.55a2 2 0 0 0 1.8 0l3.65-1.83A1 1 0 0 1 21 4.62v12.76a1 1 0 0 1-.55.9l-4.55 2.27a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.65 1.83A1 1 0 0 1 3 19.38V6.62a1 1 0 0 1 .55-.9L8.1 3.45a2 2 0 0 1 1.8 0z"/><path d="M15 5.76v15M9 3.24v15"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
   <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
@@ -130,6 +131,8 @@
           <div>
             <h2 class="h2" id="progTitle">Программа</h2>
             <p class="lead">Кейс-лекции, тренинги, мастер-классы и пленарные сессии по актуальным темам.</p>
+            <!-- PDF собирается на сервере из последней версии программы (program-pdf.php) -->
+            <a class="pdf-btn" href="program-pdf.php" download><svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>Скачать в .pdf</a>
           </div>
           <div class="chips" id="progChips" role="tablist" aria-label="Треки программы"></div>
         </div>
@@ -173,7 +176,7 @@
 
 <script src="data/rooms.js?v=20261016b"></script>
 <!-- Запасная копия программы (без интернета), затем свежая с сервера -->
-<script src="data/schedule.js?v=20261022"></script>
+<script src="data/schedule.js?v=20261023"></script>
 <script src="data/schedule.php"></script>
 <script src="assets/plan.js?v=20261016b"></script>
 <script>window.SITE_MODE = 'web';</script>

@@ -501,3 +501,14 @@ a.logo:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
 .pg-row--all td { text-align: left; }
 .pg-row--all .pg-item { position: sticky; left: 126px; align-items: flex-start; width: max-content; max-width: min(100%, calc(100vw - 180px)); }
 @media (max-width: 600px) { .pg-row--all .pg-item { left: 76px; max-width: calc(100vw - 110px); } }
+
+/* Кнопка «Скачать в .pdf» во вкладке «Программа» (только на сайте, на стойках её нет) */
+.pdf-btn {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 44px; padding: 0 18px;
+  font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 16px;
+  color: var(--white); background: var(--red); text-decoration: none; clip-path: var(--chamfer);
+  transition: background .2s var(--ease), transform .12s var(--ease);
+}
+.pdf-btn .ico { width: 20px; height: 20px; }
+.pdf-btn:hover { background: #A8080E; }
+.pdf-btn:active { transform: scale(.97); }
